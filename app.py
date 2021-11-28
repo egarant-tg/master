@@ -32,6 +32,7 @@ print("Client Created")
 async def my_event_handler(event):
     #разбиваем сообщение по строкам
     text=event.message.message.split("\n")
+    print("reading message")
     for line in text:
         #ищем нужную строку
         if "Количество СК в РСА: " in line: #настройки для "rsa_rf"
