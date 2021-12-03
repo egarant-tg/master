@@ -141,7 +141,7 @@ class CodeTypeSms(TLObject):
 
 
 class ExportedAuthorization(TLObject):
-    CONSTRUCTOR_ID = 0xdf969c2d
+    CONSTRUCTOR_ID = 0xb434e2b8
     SUBCLASS_OF_ID = 0x5fd1ec51
 
     # noinspection PyShadowingBuiltins
@@ -161,14 +161,14 @@ class ExportedAuthorization(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'-\x9c\x96\xdf',
-            struct.pack('<i', self.id),
+            b'\xb8\xe24\xb4',
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.bytes),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _id = reader.read_int()
+        _id = reader.read_long()
         _bytes = reader.tgread_bytes()
         return cls(id=_id, bytes=_bytes)
 

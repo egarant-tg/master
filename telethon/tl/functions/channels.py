@@ -886,7 +886,7 @@ class GetParticipantRequest(TLRequest):
 
 
 class GetParticipantsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x123e05e9
+    CONSTRUCTOR_ID = 0x77ced9d0
     SUBCLASS_OF_ID = 0xe60a6e64
 
     # noinspection PyShadowingBuiltins
@@ -915,12 +915,12 @@ class GetParticipantsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xe9\x05>\x12',
+            b'\xd0\xd9\xcew',
             self.channel._bytes(),
             self.filter._bytes(),
             struct.pack('<i', self.offset),
             struct.pack('<i', self.limit),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -929,8 +929,39 @@ class GetParticipantsRequest(TLRequest):
         _filter = reader.tgread_object()
         _offset = reader.read_int()
         _limit = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(channel=_channel, filter=_filter, offset=_offset, limit=_limit, hash=_hash)
+
+
+class GetSponsoredMessagesRequest(TLRequest):
+    CONSTRUCTOR_ID = 0xec210fbf
+    SUBCLASS_OF_ID = 0x7f4169e0
+
+    def __init__(self, channel: 'TypeInputChannel'):
+        """
+        :returns messages.SponsoredMessages: Instance of SponsoredMessages.
+        """
+        self.channel = channel
+
+    async def resolve(self, client, utils):
+        self.channel = utils.get_input_channel(await client.get_input_entity(self.channel))
+
+    def to_dict(self):
+        return {
+            '_': 'GetSponsoredMessagesRequest',
+            'channel': self.channel.to_dict() if isinstance(self.channel, TLObject) else self.channel
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xbf\x0f!\xec',
+            self.channel._bytes(),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _channel = reader.tgread_object()
+        return cls(channel=_channel)
 
 
 class InviteToChannelRequest(TLRequest):
@@ -1371,4 +1402,39 @@ class UpdateUsernameRequest(TLRequest):
         _channel = reader.tgread_object()
         _username = reader.tgread_string()
         return cls(channel=_channel, username=_username)
+
+
+class ViewSponsoredMessageRequest(TLRequest):
+    CONSTRUCTOR_ID = 0xbeaedb94
+    SUBCLASS_OF_ID = 0xf5b399ac
+
+    def __init__(self, channel: 'TypeInputChannel', random_id: bytes=None):
+        """
+        :returns Bool: This type has no constructors.
+        """
+        self.channel = channel
+        self.random_id = random_id if random_id is not None else int.from_bytes(os.urandom(4), 'big', signed=True)
+
+    async def resolve(self, client, utils):
+        self.channel = utils.get_input_channel(await client.get_input_entity(self.channel))
+
+    def to_dict(self):
+        return {
+            '_': 'ViewSponsoredMessageRequest',
+            'channel': self.channel.to_dict() if isinstance(self.channel, TLObject) else self.channel,
+            'random_id': self.random_id
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\x94\xdb\xae\xbe',
+            self.channel._bytes(),
+            self.serialize_bytes(self.random_id),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _channel = reader.tgread_object()
+        _random_id = reader.tgread_bytes()
+        return cls(channel=_channel, random_id=_random_id)
 

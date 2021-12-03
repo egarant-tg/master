@@ -5,7 +5,7 @@ import os
 import struct
 from datetime import datetime
 if TYPE_CHECKING:
-    from ...tl.types import TypeAuthorization, TypeAutoDownloadSettings, TypeChat, TypePasswordKdfAlgo, TypePrivacyRule, TypeSecurePasswordKdfAlgo, TypeSecureRequiredType, TypeSecureSecretSettings, TypeSecureValue, TypeSecureValueError, TypeTheme, TypeUser, TypeWallPaper, TypeWebAuthorization
+    from ...tl.types import TypeAuthorization, TypeAutoDownloadSettings, TypeChat, TypeChatTheme, TypePasswordKdfAlgo, TypePrivacyRule, TypeSecurePasswordKdfAlgo, TypeSecureRequiredType, TypeSecureSecretSettings, TypeSecureValue, TypeSecureValueError, TypeTheme, TypeUser, TypeWallPaper, TypeWebAuthorization
 
 
 
@@ -148,6 +148,63 @@ class AutoDownloadSettings(TLObject):
         return cls(low=_low, medium=_medium, high=_high)
 
 
+class ChatThemes(TLObject):
+    CONSTRUCTOR_ID = 0xfe4cbebd
+    SUBCLASS_OF_ID = 0x15c14aa8
+
+    # noinspection PyShadowingBuiltins
+    def __init__(self, hash: int, themes: List['TypeChatTheme']):
+        """
+        Constructor for account.ChatThemes: Instance of either ChatThemesNotModified, ChatThemes.
+        """
+        self.hash = hash
+        self.themes = themes
+
+    def to_dict(self):
+        return {
+            '_': 'ChatThemes',
+            'hash': self.hash,
+            'themes': [] if self.themes is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.themes]
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xbd\xbeL\xfe',
+            struct.pack('<i', self.hash),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.themes)),b''.join(x._bytes() for x in self.themes),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _hash = reader.read_int()
+        reader.read_int()
+        _themes = []
+        for _ in range(reader.read_int()):
+            _x = reader.tgread_object()
+            _themes.append(_x)
+
+        return cls(hash=_hash, themes=_themes)
+
+
+class ChatThemesNotModified(TLObject):
+    CONSTRUCTOR_ID = 0xe011e1c4
+    SUBCLASS_OF_ID = 0x15c14aa8
+
+    def to_dict(self):
+        return {
+            '_': 'ChatThemesNotModified'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xc4\xe1\x11\xe0',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
 class ContentSettings(TLObject):
     CONSTRUCTOR_ID = 0x57e28221
     SUBCLASS_OF_ID = 0xae3ff891
@@ -182,10 +239,10 @@ class ContentSettings(TLObject):
 
 
 class Password(TLObject):
-    CONSTRUCTOR_ID = 0xad2641f8
+    CONSTRUCTOR_ID = 0x185b184f
     SUBCLASS_OF_ID = 0x53a211a3
 
-    def __init__(self, new_algo: 'TypePasswordKdfAlgo', new_secure_algo: 'TypeSecurePasswordKdfAlgo', secure_random: bytes, has_recovery: Optional[bool]=None, has_secure_values: Optional[bool]=None, has_password: Optional[bool]=None, current_algo: Optional['TypePasswordKdfAlgo']=None, srp_B: Optional[bytes]=None, srp_id: Optional[int]=None, hint: Optional[str]=None, email_unconfirmed_pattern: Optional[str]=None):
+    def __init__(self, new_algo: 'TypePasswordKdfAlgo', new_secure_algo: 'TypeSecurePasswordKdfAlgo', secure_random: bytes, has_recovery: Optional[bool]=None, has_secure_values: Optional[bool]=None, has_password: Optional[bool]=None, current_algo: Optional['TypePasswordKdfAlgo']=None, srp_B: Optional[bytes]=None, srp_id: Optional[int]=None, hint: Optional[str]=None, email_unconfirmed_pattern: Optional[str]=None, pending_reset_date: Optional[datetime]=None):
         """
         Constructor for account.Password: Instance of Password.
         """
@@ -200,6 +257,7 @@ class Password(TLObject):
         self.srp_id = srp_id
         self.hint = hint
         self.email_unconfirmed_pattern = email_unconfirmed_pattern
+        self.pending_reset_date = pending_reset_date
 
     def to_dict(self):
         return {
@@ -214,14 +272,15 @@ class Password(TLObject):
             'srp_B': self.srp_B,
             'srp_id': self.srp_id,
             'hint': self.hint,
-            'email_unconfirmed_pattern': self.email_unconfirmed_pattern
+            'email_unconfirmed_pattern': self.email_unconfirmed_pattern,
+            'pending_reset_date': self.pending_reset_date
         }
 
     def _bytes(self):
         assert ((self.has_password or self.has_password is not None) and (self.current_algo or self.current_algo is not None) and (self.srp_B or self.srp_B is not None) and (self.srp_id or self.srp_id is not None)) or ((self.has_password is None or self.has_password is False) and (self.current_algo is None or self.current_algo is False) and (self.srp_B is None or self.srp_B is False) and (self.srp_id is None or self.srp_id is False)), 'has_password, current_algo, srp_B, srp_id parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xf8A&\xad',
-            struct.pack('<I', (0 if self.has_recovery is None or self.has_recovery is False else 1) | (0 if self.has_secure_values is None or self.has_secure_values is False else 2) | (0 if self.has_password is None or self.has_password is False else 4) | (0 if self.current_algo is None or self.current_algo is False else 4) | (0 if self.srp_B is None or self.srp_B is False else 4) | (0 if self.srp_id is None or self.srp_id is False else 4) | (0 if self.hint is None or self.hint is False else 8) | (0 if self.email_unconfirmed_pattern is None or self.email_unconfirmed_pattern is False else 16)),
+            b'O\x18[\x18',
+            struct.pack('<I', (0 if self.has_recovery is None or self.has_recovery is False else 1) | (0 if self.has_secure_values is None or self.has_secure_values is False else 2) | (0 if self.has_password is None or self.has_password is False else 4) | (0 if self.current_algo is None or self.current_algo is False else 4) | (0 if self.srp_B is None or self.srp_B is False else 4) | (0 if self.srp_id is None or self.srp_id is False else 4) | (0 if self.hint is None or self.hint is False else 8) | (0 if self.email_unconfirmed_pattern is None or self.email_unconfirmed_pattern is False else 16) | (0 if self.pending_reset_date is None or self.pending_reset_date is False else 32)),
             b'' if self.current_algo is None or self.current_algo is False else (self.current_algo._bytes()),
             b'' if self.srp_B is None or self.srp_B is False else (self.serialize_bytes(self.srp_B)),
             b'' if self.srp_id is None or self.srp_id is False else (struct.pack('<q', self.srp_id)),
@@ -230,6 +289,7 @@ class Password(TLObject):
             self.new_algo._bytes(),
             self.new_secure_algo._bytes(),
             self.serialize_bytes(self.secure_random),
+            b'' if self.pending_reset_date is None or self.pending_reset_date is False else (self.serialize_datetime(self.pending_reset_date)),
         ))
 
     @classmethod
@@ -262,7 +322,11 @@ class Password(TLObject):
         _new_algo = reader.tgread_object()
         _new_secure_algo = reader.tgread_object()
         _secure_random = reader.tgread_bytes()
-        return cls(new_algo=_new_algo, new_secure_algo=_new_secure_algo, secure_random=_secure_random, has_recovery=_has_recovery, has_secure_values=_has_secure_values, has_password=_has_password, current_algo=_current_algo, srp_B=_srp_B, srp_id=_srp_id, hint=_hint, email_unconfirmed_pattern=_email_unconfirmed_pattern)
+        if flags & 32:
+            _pending_reset_date = reader.tgread_date()
+        else:
+            _pending_reset_date = None
+        return cls(new_algo=_new_algo, new_secure_algo=_new_secure_algo, secure_random=_secure_random, has_recovery=_has_recovery, has_secure_values=_has_secure_values, has_password=_has_password, current_algo=_current_algo, srp_B=_srp_B, srp_id=_srp_id, hint=_hint, email_unconfirmed_pattern=_email_unconfirmed_pattern, pending_reset_date=_pending_reset_date)
 
 
 class PasswordInputSettings(TLObject):
@@ -420,6 +484,81 @@ class PrivacyRules(TLObject):
         return cls(rules=_rules, chats=_chats, users=_users)
 
 
+class ResetPasswordFailedWait(TLObject):
+    CONSTRUCTOR_ID = 0xe3779861
+    SUBCLASS_OF_ID = 0x49507416
+
+    def __init__(self, retry_date: Optional[datetime]):
+        """
+        Constructor for account.ResetPasswordResult: Instance of either ResetPasswordFailedWait, ResetPasswordRequestedWait, ResetPasswordOk.
+        """
+        self.retry_date = retry_date
+
+    def to_dict(self):
+        return {
+            '_': 'ResetPasswordFailedWait',
+            'retry_date': self.retry_date
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'a\x98w\xe3',
+            self.serialize_datetime(self.retry_date),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _retry_date = reader.tgread_date()
+        return cls(retry_date=_retry_date)
+
+
+class ResetPasswordOk(TLObject):
+    CONSTRUCTOR_ID = 0xe926d63e
+    SUBCLASS_OF_ID = 0x49507416
+
+    def to_dict(self):
+        return {
+            '_': 'ResetPasswordOk'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'>\xd6&\xe9',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
+class ResetPasswordRequestedWait(TLObject):
+    CONSTRUCTOR_ID = 0xe9effc7d
+    SUBCLASS_OF_ID = 0x49507416
+
+    def __init__(self, until_date: Optional[datetime]):
+        """
+        Constructor for account.ResetPasswordResult: Instance of either ResetPasswordFailedWait, ResetPasswordRequestedWait, ResetPasswordOk.
+        """
+        self.until_date = until_date
+
+    def to_dict(self):
+        return {
+            '_': 'ResetPasswordRequestedWait',
+            'until_date': self.until_date
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'}\xfc\xef\xe9',
+            self.serialize_datetime(self.until_date),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _until_date = reader.tgread_date()
+        return cls(until_date=_until_date)
+
+
 class SentEmailCode(TLObject):
     CONSTRUCTOR_ID = 0x811f854f
     SUBCLASS_OF_ID = 0x69f3c06e
@@ -482,7 +621,7 @@ class Takeout(TLObject):
 
 
 class Themes(TLObject):
-    CONSTRUCTOR_ID = 0x7f676421
+    CONSTRUCTOR_ID = 0x9a3d8c6d
     SUBCLASS_OF_ID = 0x7fc52204
 
     # noinspection PyShadowingBuiltins
@@ -502,14 +641,14 @@ class Themes(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'!dg\x7f',
-            struct.pack('<i', self.hash),
+            b'm\x8c=\x9a',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.themes)),b''.join(x._bytes() for x in self.themes),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _themes = []
         for _ in range(reader.read_int()):
@@ -571,7 +710,7 @@ class TmpPassword(TLObject):
 
 
 class WallPapers(TLObject):
-    CONSTRUCTOR_ID = 0x702b65a9
+    CONSTRUCTOR_ID = 0xcdc3858c
     SUBCLASS_OF_ID = 0xa2c548fd
 
     # noinspection PyShadowingBuiltins
@@ -591,14 +730,14 @@ class WallPapers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xa9e+p',
-            struct.pack('<i', self.hash),
+            b'\x8c\x85\xc3\xcd',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.wallpapers)),b''.join(x._bytes() for x in self.wallpapers),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _wallpapers = []
         for _ in range(reader.read_int()):

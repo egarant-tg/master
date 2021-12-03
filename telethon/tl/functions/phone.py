@@ -433,14 +433,15 @@ class GetCallConfigRequest(TLRequest):
 
 
 class GetGroupCallRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc7cb017
+    CONSTRUCTOR_ID = 0x41845db
     SUBCLASS_OF_ID = 0x304116be
 
-    def __init__(self, call: 'TypeInputGroupCall'):
+    def __init__(self, call: 'TypeInputGroupCall', limit: int):
         """
         :returns phone.GroupCall: Instance of GroupCall.
         """
         self.call = call
+        self.limit = limit
 
     async def resolve(self, client, utils):
         self.call = utils.get_input_group_call(self.call)
@@ -448,19 +449,22 @@ class GetGroupCallRequest(TLRequest):
     def to_dict(self):
         return {
             '_': 'GetGroupCallRequest',
-            'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call
+            'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call,
+            'limit': self.limit
         }
 
     def _bytes(self):
         return b''.join((
-            b'\x17\xb0|\x0c',
+            b'\xdbE\x18\x04',
             self.call._bytes(),
+            struct.pack('<i', self.limit),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _call = reader.tgread_object()
-        return cls(call=_call)
+        _limit = reader.read_int()
+        return cls(call=_call, limit=_limit)
 
 
 class GetGroupCallJoinAsRequest(TLRequest):
@@ -1009,16 +1013,18 @@ class StartScheduledGroupCallRequest(TLRequest):
 
 
 class ToggleGroupCallRecordRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc02a66d7
+    CONSTRUCTOR_ID = 0xf128c708
     SUBCLASS_OF_ID = 0x8af52aac
 
-    def __init__(self, call: 'TypeInputGroupCall', start: Optional[bool]=None, title: Optional[str]=None):
+    def __init__(self, call: 'TypeInputGroupCall', start: Optional[bool]=None, video: Optional[bool]=None, title: Optional[str]=None, video_portrait: Optional[bool]=None):
         """
         :returns Updates: Instance of either UpdatesTooLong, UpdateShortMessage, UpdateShortChatMessage, UpdateShort, UpdatesCombined, Updates, UpdateShortSentMessage.
         """
         self.call = call
         self.start = start
+        self.video = video
         self.title = title
+        self.video_portrait = video_portrait
 
     async def resolve(self, client, utils):
         self.call = utils.get_input_group_call(self.call)
@@ -1028,15 +1034,19 @@ class ToggleGroupCallRecordRequest(TLRequest):
             '_': 'ToggleGroupCallRecordRequest',
             'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call,
             'start': self.start,
-            'title': self.title
+            'video': self.video,
+            'title': self.title,
+            'video_portrait': self.video_portrait
         }
 
     def _bytes(self):
+        assert ((self.video or self.video is not None) and (self.video_portrait or self.video_portrait is not None)) or ((self.video is None or self.video is False) and (self.video_portrait is None or self.video_portrait is False)), 'video, video_portrait parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xd7f*\xc0',
-            struct.pack('<I', (0 if self.start is None or self.start is False else 1) | (0 if self.title is None or self.title is False else 2)),
+            b'\x08\xc7(\xf1',
+            struct.pack('<I', (0 if self.start is None or self.start is False else 1) | (0 if self.video is None or self.video is False else 4) | (0 if self.title is None or self.title is False else 2) | (0 if self.video_portrait is None else 4)),
             self.call._bytes(),
             b'' if self.title is None or self.title is False else (self.serialize_bytes(self.title)),
+            b'' if self.video_portrait is None else (b'\xb5ur\x99' if self.video_portrait else b'7\x97y\xbc'),
         ))
 
     @classmethod
@@ -1044,12 +1054,17 @@ class ToggleGroupCallRecordRequest(TLRequest):
         flags = reader.read_int()
 
         _start = bool(flags & 1)
+        _video = bool(flags & 4)
         _call = reader.tgread_object()
         if flags & 2:
             _title = reader.tgread_string()
         else:
             _title = None
-        return cls(call=_call, start=_start, title=_title)
+        if flags & 4:
+            _video_portrait = reader.tgread_bool()
+        else:
+            _video_portrait = None
+        return cls(call=_call, start=_start, video=_video, title=_title, video_portrait=_video_portrait)
 
 
 class ToggleGroupCallSettingsRequest(TLRequest):

@@ -7,6 +7,7 @@ import struct
 from datetime import datetime
 if TYPE_CHECKING:
     from ...tl.types import TypeCodeSettings, TypeInputCheckPasswordSRP
+    from ...tl.types.account import TypePasswordInputSettings
 
 
 
@@ -138,6 +139,34 @@ class CheckPasswordRequest(TLRequest):
         return cls(password=_password)
 
 
+class CheckRecoveryPasswordRequest(TLRequest):
+    CONSTRUCTOR_ID = 0xd36bf79
+    SUBCLASS_OF_ID = 0xf5b399ac
+
+    def __init__(self, code: str):
+        """
+        :returns Bool: This type has no constructors.
+        """
+        self.code = code
+
+    def to_dict(self):
+        return {
+            '_': 'CheckRecoveryPasswordRequest',
+            'code': self.code
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'y\xbf6\r',
+            self.serialize_bytes(self.code),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _code = reader.tgread_string()
+        return cls(code=_code)
+
+
 class DropTempAuthKeysRequest(TLRequest):
     CONSTRUCTOR_ID = 0x8e48a188
     SUBCLASS_OF_ID = 0xf5b399ac
@@ -200,7 +229,7 @@ class ExportAuthorizationRequest(TLRequest):
 
 
 class ExportLoginTokenRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xb1b41517
+    CONSTRUCTOR_ID = 0xb7e085fe
     SUBCLASS_OF_ID = 0x6b55f636
 
     def __init__(self, api_id: int, api_hash: str, except_ids: List[int]):
@@ -221,10 +250,10 @@ class ExportLoginTokenRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x17\x15\xb4\xb1',
+            b'\xfe\x85\xe0\xb7',
             struct.pack('<i', self.api_id),
             self.serialize_bytes(self.api_hash),
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.except_ids)),b''.join(struct.pack('<i', x) for x in self.except_ids),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.except_ids)),b''.join(struct.pack('<q', x) for x in self.except_ids),
         ))
 
     @classmethod
@@ -234,14 +263,14 @@ class ExportLoginTokenRequest(TLRequest):
         reader.read_int()
         _except_ids = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _except_ids.append(_x)
 
         return cls(api_id=_api_id, api_hash=_api_hash, except_ids=_except_ids)
 
 
 class ImportAuthorizationRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xe3ef9613
+    CONSTRUCTOR_ID = 0xa57a7dad
     SUBCLASS_OF_ID = 0xb9e04e39
 
     # noinspection PyShadowingBuiltins
@@ -261,14 +290,14 @@ class ImportAuthorizationRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x13\x96\xef\xe3',
-            struct.pack('<i', self.id),
+            b'\xad}z\xa5',
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.bytes),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _id = reader.read_int()
+        _id = reader.read_long()
         _bytes = reader.tgread_bytes()
         return cls(id=_id, bytes=_bytes)
 
@@ -361,31 +390,41 @@ class LogOutRequest(TLRequest):
 
 
 class RecoverPasswordRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x4ea56e92
+    CONSTRUCTOR_ID = 0x37096c70
     SUBCLASS_OF_ID = 0xb9e04e39
 
-    def __init__(self, code: str):
+    def __init__(self, code: str, new_settings: Optional['TypePasswordInputSettings']=None):
         """
         :returns auth.Authorization: Instance of either Authorization, AuthorizationSignUpRequired.
         """
         self.code = code
+        self.new_settings = new_settings
 
     def to_dict(self):
         return {
             '_': 'RecoverPasswordRequest',
-            'code': self.code
+            'code': self.code,
+            'new_settings': self.new_settings.to_dict() if isinstance(self.new_settings, TLObject) else self.new_settings
         }
 
     def _bytes(self):
         return b''.join((
-            b'\x92n\xa5N',
+            b'pl\t7',
+            struct.pack('<I', (0 if self.new_settings is None or self.new_settings is False else 1)),
             self.serialize_bytes(self.code),
+            b'' if self.new_settings is None or self.new_settings is False else (self.new_settings._bytes()),
         ))
 
     @classmethod
     def from_reader(cls, reader):
+        flags = reader.read_int()
+
         _code = reader.tgread_string()
-        return cls(code=_code)
+        if flags & 1:
+            _new_settings = reader.tgread_object()
+        else:
+            _new_settings = None
+        return cls(code=_code, new_settings=_new_settings)
 
 
 class RequestPasswordRecoveryRequest(TLRequest):

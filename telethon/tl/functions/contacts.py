@@ -271,7 +271,7 @@ class GetBlockedRequest(TLRequest):
 
 
 class GetContactIDsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x2caa4a42
+    CONSTRUCTOR_ID = 0x7adc669d
     SUBCLASS_OF_ID = 0x5026710f
 
     # noinspection PyShadowingBuiltins
@@ -289,13 +289,13 @@ class GetContactIDsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'BJ\xaa,',
-            struct.pack('<i', self.hash),
+            b'\x9df\xdcz',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
     @staticmethod
@@ -305,7 +305,7 @@ class GetContactIDsRequest(TLRequest):
 
 
 class GetContactsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc023849f
+    CONSTRUCTOR_ID = 0x5dd69e12
     SUBCLASS_OF_ID = 0x38be25f6
 
     # noinspection PyShadowingBuiltins
@@ -323,13 +323,13 @@ class GetContactsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x9f\x84#\xc0',
-            struct.pack('<i', self.hash),
+            b'\x12\x9e\xd6]',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
@@ -413,7 +413,7 @@ class GetStatusesRequest(TLRequest):
 
 
 class GetTopPeersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xd4982db5
+    CONSTRUCTOR_ID = 0x973478b6
     SUBCLASS_OF_ID = 0x9ee8bb88
 
     # noinspection PyShadowingBuiltins
@@ -451,11 +451,11 @@ class GetTopPeersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xb5-\x98\xd4',
+            b'\xb6x4\x97',
             struct.pack('<I', (0 if self.correspondents is None or self.correspondents is False else 1) | (0 if self.bots_pm is None or self.bots_pm is False else 2) | (0 if self.bots_inline is None or self.bots_inline is False else 4) | (0 if self.phone_calls is None or self.phone_calls is False else 8) | (0 if self.forward_users is None or self.forward_users is False else 16) | (0 if self.forward_chats is None or self.forward_chats is False else 32) | (0 if self.groups is None or self.groups is False else 1024) | (0 if self.channels is None or self.channels is False else 32768)),
             struct.pack('<i', self.offset),
             struct.pack('<i', self.limit),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -472,7 +472,7 @@ class GetTopPeersRequest(TLRequest):
         _channels = bool(flags & 32768)
         _offset = reader.read_int()
         _limit = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(offset=_offset, limit=_limit, hash=_hash, correspondents=_correspondents, bots_pm=_bots_pm, bots_inline=_bots_inline, phone_calls=_phone_calls, forward_users=_forward_users, forward_chats=_forward_chats, groups=_groups, channels=_channels)
 
 

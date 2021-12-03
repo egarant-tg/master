@@ -110,7 +110,7 @@ class AcceptUrlAuthRequest(TLRequest):
 
 
 class AddChatUserRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xf9a0aa09
+    CONSTRUCTOR_ID = 0xf24753e3
     SUBCLASS_OF_ID = 0x8af52aac
 
     def __init__(self, chat_id: int, user_id: 'TypeInputUser', fwd_limit: int):
@@ -122,7 +122,6 @@ class AddChatUserRequest(TLRequest):
         self.fwd_limit = fwd_limit
 
     async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
         self.user_id = utils.get_input_user(await client.get_input_entity(self.user_id))
 
     def to_dict(self):
@@ -135,15 +134,15 @@ class AddChatUserRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\t\xaa\xa0\xf9',
-            struct.pack('<i', self.chat_id),
+            b'\xe3SG\xf2',
+            struct.pack('<q', self.chat_id),
             self.user_id._bytes(),
             struct.pack('<i', self.fwd_limit),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _user_id = reader.tgread_object()
         _fwd_limit = reader.read_int()
         return cls(chat_id=_chat_id, user_id=_user_id, fwd_limit=_fwd_limit)
@@ -331,7 +330,7 @@ class CreateChatRequest(TLRequest):
 
 
 class DeleteChatRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x83247d11
+    CONSTRUCTOR_ID = 0x5bd0ee50
     SUBCLASS_OF_ID = 0xf5b399ac
 
     def __init__(self, chat_id: int):
@@ -339,9 +338,6 @@ class DeleteChatRequest(TLRequest):
         :returns Bool: This type has no constructors.
         """
         self.chat_id = chat_id
-
-    async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
 
     def to_dict(self):
         return {
@@ -351,18 +347,18 @@ class DeleteChatRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x11}$\x83',
-            struct.pack('<i', self.chat_id),
+            b'P\xee\xd0[',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
 class DeleteChatUserRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc534459a
+    CONSTRUCTOR_ID = 0xa2185cab
     SUBCLASS_OF_ID = 0x8af52aac
 
     def __init__(self, chat_id: int, user_id: 'TypeInputUser', revoke_history: Optional[bool]=None):
@@ -374,7 +370,6 @@ class DeleteChatUserRequest(TLRequest):
         self.revoke_history = revoke_history
 
     async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
         self.user_id = utils.get_input_user(await client.get_input_entity(self.user_id))
 
     def to_dict(self):
@@ -387,9 +382,9 @@ class DeleteChatUserRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x9aE4\xc5',
+            b'\xab\\\x18\xa2',
             struct.pack('<I', (0 if self.revoke_history is None or self.revoke_history is False else 1)),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.chat_id),
             self.user_id._bytes(),
         ))
 
@@ -398,7 +393,7 @@ class DeleteChatUserRequest(TLRequest):
         flags = reader.read_int()
 
         _revoke_history = bool(flags & 1)
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _user_id = reader.tgread_object()
         return cls(chat_id=_chat_id, user_id=_user_id, revoke_history=_revoke_history)
 
@@ -699,7 +694,7 @@ class EditChatAboutRequest(TLRequest):
 
 
 class EditChatAdminRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xa9e69f2e
+    CONSTRUCTOR_ID = 0xa85bd1c2
     SUBCLASS_OF_ID = 0xf5b399ac
 
     def __init__(self, chat_id: int, user_id: 'TypeInputUser', is_admin: bool):
@@ -711,7 +706,6 @@ class EditChatAdminRequest(TLRequest):
         self.is_admin = is_admin
 
     async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
         self.user_id = utils.get_input_user(await client.get_input_entity(self.user_id))
 
     def to_dict(self):
@@ -724,15 +718,15 @@ class EditChatAdminRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'.\x9f\xe6\xa9',
-            struct.pack('<i', self.chat_id),
+            b'\xc2\xd1[\xa8',
+            struct.pack('<q', self.chat_id),
             self.user_id._bytes(),
             b'\xb5ur\x99' if self.is_admin else b'7\x97y\xbc',
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _user_id = reader.tgread_object()
         _is_admin = reader.tgread_bool()
         return cls(chat_id=_chat_id, user_id=_user_id, is_admin=_is_admin)
@@ -774,7 +768,7 @@ class EditChatDefaultBannedRightsRequest(TLRequest):
 
 
 class EditChatPhotoRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xca4c79d8
+    CONSTRUCTOR_ID = 0x35ddd674
     SUBCLASS_OF_ID = 0x8af52aac
 
     def __init__(self, chat_id: int, photo: 'TypeInputChatPhoto'):
@@ -785,7 +779,6 @@ class EditChatPhotoRequest(TLRequest):
         self.photo = photo
 
     async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
         self.photo = utils.get_input_chat_photo(self.photo)
 
     def to_dict(self):
@@ -797,20 +790,20 @@ class EditChatPhotoRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xd8yL\xca',
-            struct.pack('<i', self.chat_id),
+            b't\xd6\xdd5',
+            struct.pack('<q', self.chat_id),
             self.photo._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _photo = reader.tgread_object()
         return cls(chat_id=_chat_id, photo=_photo)
 
 
 class EditChatTitleRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xdc452855
+    CONSTRUCTOR_ID = 0x73783ffd
     SUBCLASS_OF_ID = 0x8af52aac
 
     def __init__(self, chat_id: int, title: str):
@@ -819,9 +812,6 @@ class EditChatTitleRequest(TLRequest):
         """
         self.chat_id = chat_id
         self.title = title
-
-    async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
 
     def to_dict(self):
         return {
@@ -832,14 +822,14 @@ class EditChatTitleRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'U(E\xdc',
-            struct.pack('<i', self.chat_id),
+            b'\xfd?xs',
+            struct.pack('<q', self.chat_id),
             self.serialize_bytes(self.title),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _title = reader.tgread_string()
         return cls(chat_id=_chat_id, title=_title)
 
@@ -1147,7 +1137,7 @@ class ForwardMessagesRequest(TLRequest):
     SUBCLASS_OF_ID = 0x8af52aac
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, from_peer: 'TypeInputPeer', id: List[int], to_peer: 'TypeInputPeer', silent: Optional[bool]=None, background: Optional[bool]=None, with_my_score: Optional[bool]=None, random_id: List[int]=None, schedule_date: Optional[datetime]=None):
+    def __init__(self, from_peer: 'TypeInputPeer', id: List[int], to_peer: 'TypeInputPeer', silent: Optional[bool]=None, background: Optional[bool]=None, with_my_score: Optional[bool]=None, drop_author: Optional[bool]=None, drop_media_captions: Optional[bool]=None, random_id: List[int]=None, schedule_date: Optional[datetime]=None):
         """
         :returns Updates: Instance of either UpdatesTooLong, UpdateShortMessage, UpdateShortChatMessage, UpdateShort, UpdatesCombined, Updates, UpdateShortSentMessage.
         """
@@ -1157,6 +1147,8 @@ class ForwardMessagesRequest(TLRequest):
         self.silent = silent
         self.background = background
         self.with_my_score = with_my_score
+        self.drop_author = drop_author
+        self.drop_media_captions = drop_media_captions
         self.random_id = random_id if random_id is not None else [int.from_bytes(os.urandom(8), 'big', signed=True) for _ in range(len(id))]
         self.schedule_date = schedule_date
 
@@ -1173,6 +1165,8 @@ class ForwardMessagesRequest(TLRequest):
             'silent': self.silent,
             'background': self.background,
             'with_my_score': self.with_my_score,
+            'drop_author': self.drop_author,
+            'drop_media_captions': self.drop_media_captions,
             'random_id': [] if self.random_id is None else self.random_id[:],
             'schedule_date': self.schedule_date
         }
@@ -1180,7 +1174,7 @@ class ForwardMessagesRequest(TLRequest):
     def _bytes(self):
         return b''.join((
             b'\x0e\xe6\xfe\xd9',
-            struct.pack('<I', (0 if self.silent is None or self.silent is False else 32) | (0 if self.background is None or self.background is False else 64) | (0 if self.with_my_score is None or self.with_my_score is False else 256) | (0 if self.schedule_date is None or self.schedule_date is False else 1024)),
+            struct.pack('<I', (0 if self.silent is None or self.silent is False else 32) | (0 if self.background is None or self.background is False else 64) | (0 if self.with_my_score is None or self.with_my_score is False else 256) | (0 if self.drop_author is None or self.drop_author is False else 2048) | (0 if self.drop_media_captions is None or self.drop_media_captions is False else 4096) | (0 if self.schedule_date is None or self.schedule_date is False else 1024)),
             self.from_peer._bytes(),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.id)),b''.join(struct.pack('<i', x) for x in self.id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.random_id)),b''.join(struct.pack('<q', x) for x in self.random_id),
@@ -1195,6 +1189,8 @@ class ForwardMessagesRequest(TLRequest):
         _silent = bool(flags & 32)
         _background = bool(flags & 64)
         _with_my_score = bool(flags & 256)
+        _drop_author = bool(flags & 2048)
+        _drop_media_captions = bool(flags & 4096)
         _from_peer = reader.tgread_object()
         reader.read_int()
         _id = []
@@ -1213,7 +1209,7 @@ class ForwardMessagesRequest(TLRequest):
             _schedule_date = reader.tgread_date()
         else:
             _schedule_date = None
-        return cls(from_peer=_from_peer, id=_id, to_peer=_to_peer, silent=_silent, background=_background, with_my_score=_with_my_score, random_id=_random_id, schedule_date=_schedule_date)
+        return cls(from_peer=_from_peer, id=_id, to_peer=_to_peer, silent=_silent, background=_background, with_my_score=_with_my_score, drop_author=_drop_author, drop_media_captions=_drop_media_captions, random_id=_random_id, schedule_date=_schedule_date)
 
 
 class GetAdminsWithInvitesRequest(TLRequest):
@@ -1248,7 +1244,7 @@ class GetAdminsWithInvitesRequest(TLRequest):
 
 
 class GetAllChatsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xeba80ff0
+    CONSTRUCTOR_ID = 0x875f74be
     SUBCLASS_OF_ID = 0x99d5cb14
 
     def __init__(self, except_ids: List[int]):
@@ -1265,8 +1261,8 @@ class GetAllChatsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xf0\x0f\xa8\xeb',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.except_ids)),b''.join(struct.pack('<i', x) for x in self.except_ids),
+            b'\xbet_\x87',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.except_ids)),b''.join(struct.pack('<q', x) for x in self.except_ids),
         ))
 
     @classmethod
@@ -1274,7 +1270,7 @@ class GetAllChatsRequest(TLRequest):
         reader.read_int()
         _except_ids = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _except_ids.append(_x)
 
         return cls(except_ids=_except_ids)
@@ -1300,7 +1296,7 @@ class GetAllDraftsRequest(TLRequest):
 
 
 class GetAllStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x1c9618b1
+    CONSTRUCTOR_ID = 0xb8a0a1a8
     SUBCLASS_OF_ID = 0x45834829
 
     # noinspection PyShadowingBuiltins
@@ -1318,13 +1314,13 @@ class GetAllStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xb1\x18\x96\x1c',
-            struct.pack('<i', self.hash),
+            b'\xa8\xa1\xa0\xb8',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
@@ -1498,7 +1494,7 @@ class GetChatInviteImportersRequest(TLRequest):
 
 
 class GetChatsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x3c6aa187
+    CONSTRUCTOR_ID = 0x49e9528f
     SUBCLASS_OF_ID = 0x99d5cb14
 
     # noinspection PyShadowingBuiltins
@@ -1516,8 +1512,8 @@ class GetChatsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x87\xa1j<',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.id)),b''.join(struct.pack('<i', x) for x in self.id),
+            b'\x8fR\xe9I',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.id)),b''.join(struct.pack('<q', x) for x in self.id),
         ))
 
     @classmethod
@@ -1525,14 +1521,14 @@ class GetChatsRequest(TLRequest):
         reader.read_int()
         _id = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _id.append(_x)
 
         return cls(id=_id)
 
 
 class GetCommonChatsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xd0a48c4
+    CONSTRUCTOR_ID = 0xe40ca104
     SUBCLASS_OF_ID = 0x99d5cb14
 
     def __init__(self, user_id: 'TypeInputUser', max_id: int, limit: int):
@@ -1556,16 +1552,16 @@ class GetCommonChatsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xc4H\n\r',
+            b'\x04\xa1\x0c\xe4',
             self.user_id._bytes(),
-            struct.pack('<i', self.max_id),
+            struct.pack('<q', self.max_id),
             struct.pack('<i', self.limit),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _user_id = reader.tgread_object()
-        _max_id = reader.read_int()
+        _max_id = reader.read_long()
         _limit = reader.read_int()
         return cls(user_id=_user_id, max_id=_max_id, limit=_limit)
 
@@ -1641,7 +1637,7 @@ class GetDialogUnreadMarksRequest(TLRequest):
 
 
 class GetDialogsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xa0ee3b73
+    CONSTRUCTOR_ID = 0xa0f4cb4f
     SUBCLASS_OF_ID = 0xe1b52ee
 
     # noinspection PyShadowingBuiltins
@@ -1674,14 +1670,14 @@ class GetDialogsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b's;\xee\xa0',
+            b'O\xcb\xf4\xa0',
             struct.pack('<I', (0 if self.exclude_pinned is None or self.exclude_pinned is False else 1) | (0 if self.folder_id is None or self.folder_id is False else 2)),
             b'' if self.folder_id is None or self.folder_id is False else (struct.pack('<i', self.folder_id)),
             self.serialize_datetime(self.offset_date),
             struct.pack('<i', self.offset_id),
             self.offset_peer._bytes(),
             struct.pack('<i', self.limit),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -1697,7 +1693,7 @@ class GetDialogsRequest(TLRequest):
         _offset_id = reader.read_int()
         _offset_peer = reader.tgread_object()
         _limit = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(offset_date=_offset_date, offset_id=_offset_id, offset_peer=_offset_peer, limit=_limit, hash=_hash, exclude_pinned=_exclude_pinned, folder_id=_folder_id)
 
 
@@ -1990,7 +1986,7 @@ class GetExportedChatInvitesRequest(TLRequest):
 
 
 class GetFavedStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x21ce0b0e
+    CONSTRUCTOR_ID = 0x4f1aaa9
     SUBCLASS_OF_ID = 0x8e736fb9
 
     # noinspection PyShadowingBuiltins
@@ -2008,18 +2004,18 @@ class GetFavedStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x0e\x0b\xce!',
-            struct.pack('<i', self.hash),
+            b'\xa9\xaa\xf1\x04',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
 class GetFeaturedStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x2dacca4f
+    CONSTRUCTOR_ID = 0x64780b14
     SUBCLASS_OF_ID = 0x2614b722
 
     # noinspection PyShadowingBuiltins
@@ -2037,18 +2033,18 @@ class GetFeaturedStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'O\xca\xac-',
-            struct.pack('<i', self.hash),
+            b'\x14\x0bxd',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
 class GetFullChatRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x3b831c66
+    CONSTRUCTOR_ID = 0xaeb00b34
     SUBCLASS_OF_ID = 0x225a5109
 
     def __init__(self, chat_id: int):
@@ -2056,9 +2052,6 @@ class GetFullChatRequest(TLRequest):
         :returns messages.ChatFull: Instance of ChatFull.
         """
         self.chat_id = chat_id
-
-    async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
 
     def to_dict(self):
         return {
@@ -2068,13 +2061,13 @@ class GetFullChatRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'f\x1c\x83;',
-            struct.pack('<i', self.chat_id),
+            b'4\x0b\xb0\xae',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
@@ -2120,7 +2113,7 @@ class GetGameHighScoresRequest(TLRequest):
 
 
 class GetHistoryRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xdcbb8260
+    CONSTRUCTOR_ID = 0x4423e6c5
     SUBCLASS_OF_ID = 0xd4b40b5e
 
     # noinspection PyShadowingBuiltins
@@ -2155,7 +2148,7 @@ class GetHistoryRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'`\x82\xbb\xdc',
+            b'\xc5\xe6#D',
             self.peer._bytes(),
             struct.pack('<i', self.offset_id),
             self.serialize_datetime(self.offset_date),
@@ -2163,7 +2156,7 @@ class GetHistoryRequest(TLRequest):
             struct.pack('<i', self.limit),
             struct.pack('<i', self.max_id),
             struct.pack('<i', self.min_id),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -2175,7 +2168,7 @@ class GetHistoryRequest(TLRequest):
         _limit = reader.read_int()
         _max_id = reader.read_int()
         _min_id = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(peer=_peer, offset_id=_offset_id, offset_date=_offset_date, add_offset=_add_offset, limit=_limit, max_id=_max_id, min_id=_min_id, hash=_hash)
 
 
@@ -2270,7 +2263,7 @@ class GetInlineGameHighScoresRequest(TLRequest):
 
 
 class GetMaskStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x65b8c79f
+    CONSTRUCTOR_ID = 0x640f82b8
     SUBCLASS_OF_ID = 0x45834829
 
     # noinspection PyShadowingBuiltins
@@ -2288,13 +2281,13 @@ class GetMaskStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x9f\xc7\xb8e',
-            struct.pack('<i', self.hash),
+            b'\xb8\x82\x0fd',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
@@ -2332,6 +2325,46 @@ class GetMessageEditDataRequest(TLRequest):
         _peer = reader.tgread_object()
         _id = reader.read_int()
         return cls(peer=_peer, id=_id)
+
+
+class GetMessageReadParticipantsRequest(TLRequest):
+    CONSTRUCTOR_ID = 0x2c6f97b7
+    SUBCLASS_OF_ID = 0x8918e168
+
+    def __init__(self, peer: 'TypeInputPeer', msg_id: int):
+        """
+        :returns Vector<long>: This type has no constructors.
+        """
+        self.peer = peer
+        self.msg_id = msg_id
+
+    async def resolve(self, client, utils):
+        self.peer = utils.get_input_peer(await client.get_input_entity(self.peer))
+
+    def to_dict(self):
+        return {
+            '_': 'GetMessageReadParticipantsRequest',
+            'peer': self.peer.to_dict() if isinstance(self.peer, TLObject) else self.peer,
+            'msg_id': self.msg_id
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xb7\x97o,',
+            self.peer._bytes(),
+            struct.pack('<i', self.msg_id),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _peer = reader.tgread_object()
+        _msg_id = reader.read_int()
+        return cls(peer=_peer, msg_id=_msg_id)
+
+    @staticmethod
+    def read_result(reader):
+        reader.read_int()  # Vector ID
+        return [reader.read_long() for _ in range(reader.read_int())]
 
 
 class GetMessagesRequest(TLRequest):
@@ -2421,7 +2454,7 @@ class GetMessagesViewsRequest(TLRequest):
 
 
 class GetOldFeaturedStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x5fe7025b
+    CONSTRUCTOR_ID = 0x7ed094a1
     SUBCLASS_OF_ID = 0x2614b722
 
     # noinspection PyShadowingBuiltins
@@ -2443,17 +2476,17 @@ class GetOldFeaturedStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'[\x02\xe7_',
+            b'\xa1\x94\xd0~',
             struct.pack('<i', self.offset),
             struct.pack('<i', self.limit),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _offset = reader.read_int()
         _limit = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(offset=_offset, limit=_limit, hash=_hash)
 
 
@@ -2680,7 +2713,7 @@ class GetPollVotesRequest(TLRequest):
 
 
 class GetRecentLocationsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xbbc45b09
+    CONSTRUCTOR_ID = 0x702a40e0
     SUBCLASS_OF_ID = 0xd4b40b5e
 
     # noinspection PyShadowingBuiltins
@@ -2705,22 +2738,22 @@ class GetRecentLocationsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\t[\xc4\xbb',
+            b'\xe0@*p',
             self.peer._bytes(),
             struct.pack('<i', self.limit),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
         _limit = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(peer=_peer, limit=_limit, hash=_hash)
 
 
 class GetRecentStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x5ea192c9
+    CONSTRUCTOR_ID = 0x9da9403b
     SUBCLASS_OF_ID = 0xf76f8683
 
     # noinspection PyShadowingBuiltins
@@ -2740,9 +2773,9 @@ class GetRecentStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xc9\x92\xa1^',
+            b';@\xa9\x9d',
             struct.pack('<I', (0 if self.attached is None or self.attached is False else 1)),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -2750,12 +2783,12 @@ class GetRecentStickersRequest(TLRequest):
         flags = reader.read_int()
 
         _attached = bool(flags & 1)
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash, attached=_attached)
 
 
 class GetRepliesRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x24b581ba
+    CONSTRUCTOR_ID = 0x22ddd30c
     SUBCLASS_OF_ID = 0xd4b40b5e
 
     # noinspection PyShadowingBuiltins
@@ -2792,7 +2825,7 @@ class GetRepliesRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xba\x81\xb5$',
+            b'\x0c\xd3\xdd"',
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
             struct.pack('<i', self.offset_id),
@@ -2801,7 +2834,7 @@ class GetRepliesRequest(TLRequest):
             struct.pack('<i', self.limit),
             struct.pack('<i', self.max_id),
             struct.pack('<i', self.min_id),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -2814,12 +2847,12 @@ class GetRepliesRequest(TLRequest):
         _limit = reader.read_int()
         _max_id = reader.read_int()
         _min_id = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(peer=_peer, msg_id=_msg_id, offset_id=_offset_id, offset_date=_offset_date, add_offset=_add_offset, limit=_limit, max_id=_max_id, min_id=_min_id, hash=_hash)
 
 
 class GetSavedGifsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x83bf3d52
+    CONSTRUCTOR_ID = 0x5cf09635
     SUBCLASS_OF_ID = 0xa68b61f5
 
     # noinspection PyShadowingBuiltins
@@ -2837,18 +2870,18 @@ class GetSavedGifsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'R=\xbf\x83',
-            struct.pack('<i', self.hash),
+            b'5\x96\xf0\\',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
 class GetScheduledHistoryRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xe2c2685b
+    CONSTRUCTOR_ID = 0xf516760b
     SUBCLASS_OF_ID = 0xd4b40b5e
 
     # noinspection PyShadowingBuiltins
@@ -2871,15 +2904,15 @@ class GetScheduledHistoryRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'[h\xc2\xe2',
+            b'\x0bv\x16\xf5',
             self.peer._bytes(),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(peer=_peer, hash=_hash)
 
 
@@ -3053,7 +3086,7 @@ class GetStickerSetRequest(TLRequest):
 
 
 class GetStickersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x43d4f2c
+    CONSTRUCTOR_ID = 0xd5a5d3a1
     SUBCLASS_OF_ID = 0xd73bb9de
 
     # noinspection PyShadowingBuiltins
@@ -3073,15 +3106,15 @@ class GetStickersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b',O=\x04',
+            b'\xa1\xd3\xa5\xd5',
             self.serialize_bytes(self.emoticon),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _emoticon = reader.tgread_string()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(emoticon=_emoticon, hash=_hash)
 
 
@@ -3400,7 +3433,7 @@ class MarkDialogUnreadRequest(TLRequest):
 
 
 class MigrateChatRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x15a3b8e3
+    CONSTRUCTOR_ID = 0xa2875319
     SUBCLASS_OF_ID = 0x8af52aac
 
     def __init__(self, chat_id: int):
@@ -3408,9 +3441,6 @@ class MigrateChatRequest(TLRequest):
         :returns Updates: Instance of either UpdatesTooLong, UpdateShortMessage, UpdateShortChatMessage, UpdateShort, UpdatesCombined, Updates, UpdateShortSentMessage.
         """
         self.chat_id = chat_id
-
-    async def resolve(self, client, utils):
-        self.chat_id = await client.get_peer_id(self.chat_id, add_mark=False)
 
     def to_dict(self):
         return {
@@ -3420,13 +3450,13 @@ class MigrateChatRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xe3\xb8\xa3\x15',
-            struct.pack('<i', self.chat_id),
+            b'\x19S\x87\xa2',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
@@ -4131,7 +4161,7 @@ class SaveRecentStickerRequest(TLRequest):
 
 
 class SearchRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc352eec
+    CONSTRUCTOR_ID = 0xa0fda762
     SUBCLASS_OF_ID = 0xd4b40b5e
 
     # noinspection PyShadowingBuiltins
@@ -4178,7 +4208,7 @@ class SearchRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xec.5\x0c',
+            b'b\xa7\xfd\xa0',
             struct.pack('<I', (0 if self.from_id is None or self.from_id is False else 1) | (0 if self.top_msg_id is None or self.top_msg_id is False else 2)),
             self.peer._bytes(),
             self.serialize_bytes(self.q),
@@ -4192,7 +4222,7 @@ class SearchRequest(TLRequest):
             struct.pack('<i', self.limit),
             struct.pack('<i', self.max_id),
             struct.pack('<i', self.min_id),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -4217,7 +4247,7 @@ class SearchRequest(TLRequest):
         _limit = reader.read_int()
         _max_id = reader.read_int()
         _min_id = reader.read_int()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(peer=_peer, q=_q, filter=_filter, min_date=_min_date, max_date=_max_date, offset_id=_offset_id, add_offset=_add_offset, limit=_limit, max_id=_max_id, min_id=_min_id, hash=_hash, from_id=_from_id, top_msg_id=_top_msg_id)
 
 
@@ -4292,7 +4322,7 @@ class SearchGlobalRequest(TLRequest):
 
 
 class SearchStickerSetsRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xc2b7d08b
+    CONSTRUCTOR_ID = 0x35705b8a
     SUBCLASS_OF_ID = 0x40df361
 
     # noinspection PyShadowingBuiltins
@@ -4314,10 +4344,10 @@ class SearchStickerSetsRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x8b\xd0\xb7\xc2',
+            b'\x8a[p5',
             struct.pack('<I', (0 if self.exclude_featured is None or self.exclude_featured is False else 1)),
             self.serialize_bytes(self.q),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
@@ -4326,7 +4356,7 @@ class SearchStickerSetsRequest(TLRequest):
 
         _exclude_featured = bool(flags & 1)
         _q = reader.tgread_string()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(q=_q, hash=_hash, exclude_featured=_exclude_featured)
 
 
@@ -5034,6 +5064,41 @@ class SetBotShippingResultsRequest(TLRequest):
         else:
             _shipping_options = None
         return cls(query_id=_query_id, error=_error, shipping_options=_shipping_options)
+
+
+class SetChatThemeRequest(TLRequest):
+    CONSTRUCTOR_ID = 0xe63be13f
+    SUBCLASS_OF_ID = 0x8af52aac
+
+    def __init__(self, peer: 'TypeInputPeer', emoticon: str):
+        """
+        :returns Updates: Instance of either UpdatesTooLong, UpdateShortMessage, UpdateShortChatMessage, UpdateShort, UpdatesCombined, Updates, UpdateShortSentMessage.
+        """
+        self.peer = peer
+        self.emoticon = emoticon
+
+    async def resolve(self, client, utils):
+        self.peer = utils.get_input_peer(await client.get_input_entity(self.peer))
+
+    def to_dict(self):
+        return {
+            '_': 'SetChatThemeRequest',
+            'peer': self.peer.to_dict() if isinstance(self.peer, TLObject) else self.peer,
+            'emoticon': self.emoticon
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'?\xe1;\xe6',
+            self.peer._bytes(),
+            self.serialize_bytes(self.emoticon),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _peer = reader.tgread_object()
+        _emoticon = reader.tgread_string()
+        return cls(peer=_peer, emoticon=_emoticon)
 
 
 class SetEncryptedTypingRequest(TLRequest):

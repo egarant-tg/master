@@ -47,7 +47,7 @@ class BankCardData(TLObject):
 
 
 class PaymentForm(TLObject):
-    CONSTRUCTOR_ID = 0x8d0b2415
+    CONSTRUCTOR_ID = 0x1694761b
     SUBCLASS_OF_ID = 0xa0483f19
 
     def __init__(self, form_id: int, bot_id: int, invoice: 'TypeInvoice', provider_id: int, url: str, users: List['TypeUser'], can_save_credentials: Optional[bool]=None, password_missing: Optional[bool]=None, native_provider: Optional[str]=None, native_params: Optional['TypeDataJSON']=None, saved_info: Optional['TypePaymentRequestedInfo']=None, saved_credentials: Optional['TypePaymentSavedCredentials']=None):
@@ -87,12 +87,12 @@ class PaymentForm(TLObject):
     def _bytes(self):
         assert ((self.native_provider or self.native_provider is not None) and (self.native_params or self.native_params is not None)) or ((self.native_provider is None or self.native_provider is False) and (self.native_params is None or self.native_params is False)), 'native_provider, native_params parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\x15$\x0b\x8d',
+            b'\x1bv\x94\x16',
             struct.pack('<I', (0 if self.can_save_credentials is None or self.can_save_credentials is False else 4) | (0 if self.password_missing is None or self.password_missing is False else 8) | (0 if self.native_provider is None or self.native_provider is False else 16) | (0 if self.native_params is None or self.native_params is False else 16) | (0 if self.saved_info is None or self.saved_info is False else 1) | (0 if self.saved_credentials is None or self.saved_credentials is False else 2)),
             struct.pack('<q', self.form_id),
-            struct.pack('<i', self.bot_id),
+            struct.pack('<q', self.bot_id),
             self.invoice._bytes(),
-            struct.pack('<i', self.provider_id),
+            struct.pack('<q', self.provider_id),
             self.serialize_bytes(self.url),
             b'' if self.native_provider is None or self.native_provider is False else (self.serialize_bytes(self.native_provider)),
             b'' if self.native_params is None or self.native_params is False else (self.native_params._bytes()),
@@ -108,9 +108,9 @@ class PaymentForm(TLObject):
         _can_save_credentials = bool(flags & 4)
         _password_missing = bool(flags & 8)
         _form_id = reader.read_long()
-        _bot_id = reader.read_int()
+        _bot_id = reader.read_long()
         _invoice = reader.tgread_object()
-        _provider_id = reader.read_int()
+        _provider_id = reader.read_long()
         _url = reader.tgread_string()
         if flags & 16:
             _native_provider = reader.tgread_string()
@@ -138,7 +138,7 @@ class PaymentForm(TLObject):
 
 
 class PaymentReceipt(TLObject):
-    CONSTRUCTOR_ID = 0x10b555d0
+    CONSTRUCTOR_ID = 0x70c4fe03
     SUBCLASS_OF_ID = 0x590093c9
 
     def __init__(self, date: Optional[datetime], bot_id: int, provider_id: int, title: str, description: str, invoice: 'TypeInvoice', currency: str, total_amount: int, credentials_title: str, users: List['TypeUser'], photo: Optional['TypeWebDocument']=None, info: Optional['TypePaymentRequestedInfo']=None, shipping: Optional['TypeShippingOption']=None, tip_amount: Optional[int]=None):
@@ -181,11 +181,11 @@ class PaymentReceipt(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xd0U\xb5\x10',
+            b'\x03\xfe\xc4p',
             struct.pack('<I', (0 if self.photo is None or self.photo is False else 4) | (0 if self.info is None or self.info is False else 1) | (0 if self.shipping is None or self.shipping is False else 2) | (0 if self.tip_amount is None or self.tip_amount is False else 8)),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.bot_id),
-            struct.pack('<i', self.provider_id),
+            struct.pack('<q', self.bot_id),
+            struct.pack('<q', self.provider_id),
             self.serialize_bytes(self.title),
             self.serialize_bytes(self.description),
             b'' if self.photo is None or self.photo is False else (self.photo._bytes()),
@@ -204,8 +204,8 @@ class PaymentReceipt(TLObject):
         flags = reader.read_int()
 
         _date = reader.tgread_date()
-        _bot_id = reader.read_int()
-        _provider_id = reader.read_int()
+        _bot_id = reader.read_long()
+        _provider_id = reader.read_long()
         _title = reader.tgread_string()
         _description = reader.tgread_string()
         if flags & 4:

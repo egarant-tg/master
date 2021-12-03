@@ -5,7 +5,7 @@ import os
 import struct
 from datetime import datetime
 if TYPE_CHECKING:
-    from ...tl.types import TypeBotInlineResult, TypeChat, TypeChatAdminWithInvites, TypeChatFull, TypeChatInviteImporter, TypeDialog, TypeDocument, TypeEncryptedFile, TypeExportedChatInvite, TypeHighScore, TypeInlineBotSwitchPM, TypeMessage, TypeMessageUserVote, TypeMessageViews, TypeMessagesFilter, TypeStickerPack, TypeStickerSet, TypeStickerSetCovered, TypeUser
+    from ...tl.types import TypeBotInlineResult, TypeChat, TypeChatAdminWithInvites, TypeChatFull, TypeChatInviteImporter, TypeDialog, TypeDocument, TypeEncryptedFile, TypeExportedChatInvite, TypeHighScore, TypeInlineBotSwitchPM, TypeMessage, TypeMessageUserVote, TypeMessageViews, TypeMessagesFilter, TypeSponsoredMessage, TypeStickerPack, TypeStickerSet, TypeStickerSetCovered, TypeUser
     from ...tl.types.updates import TypeState
 
 
@@ -124,7 +124,7 @@ class AffectedMessages(TLObject):
 
 
 class AllStickers(TLObject):
-    CONSTRUCTOR_ID = 0xedfd405f
+    CONSTRUCTOR_ID = 0xcdbbcebb
     SUBCLASS_OF_ID = 0x45834829
 
     # noinspection PyShadowingBuiltins
@@ -144,14 +144,14 @@ class AllStickers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'_@\xfd\xed',
-            struct.pack('<i', self.hash),
+            b'\xbb\xce\xbb\xcd',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.sets)),b''.join(x._bytes() for x in self.sets),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _sets = []
         for _ in range(reader.read_int()):
@@ -866,14 +866,15 @@ class DialogsSlice(TLObject):
 
 
 class DiscussionMessage(TLObject):
-    CONSTRUCTOR_ID = 0xf5dd8f9d
+    CONSTRUCTOR_ID = 0xa6341782
     SUBCLASS_OF_ID = 0x53f8e3e8
 
-    def __init__(self, messages: List['TypeMessage'], chats: List['TypeChat'], users: List['TypeUser'], max_id: Optional[int]=None, read_inbox_max_id: Optional[int]=None, read_outbox_max_id: Optional[int]=None):
+    def __init__(self, messages: List['TypeMessage'], unread_count: int, chats: List['TypeChat'], users: List['TypeUser'], max_id: Optional[int]=None, read_inbox_max_id: Optional[int]=None, read_outbox_max_id: Optional[int]=None):
         """
         Constructor for messages.DiscussionMessage: Instance of DiscussionMessage.
         """
         self.messages = messages
+        self.unread_count = unread_count
         self.chats = chats
         self.users = users
         self.max_id = max_id
@@ -884,6 +885,7 @@ class DiscussionMessage(TLObject):
         return {
             '_': 'DiscussionMessage',
             'messages': [] if self.messages is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.messages],
+            'unread_count': self.unread_count,
             'chats': [] if self.chats is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.chats],
             'users': [] if self.users is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.users],
             'max_id': self.max_id,
@@ -893,12 +895,13 @@ class DiscussionMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x9d\x8f\xdd\xf5',
+            b'\x82\x174\xa6',
             struct.pack('<I', (0 if self.max_id is None or self.max_id is False else 1) | (0 if self.read_inbox_max_id is None or self.read_inbox_max_id is False else 2) | (0 if self.read_outbox_max_id is None or self.read_outbox_max_id is False else 4)),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.messages)),b''.join(x._bytes() for x in self.messages),
             b'' if self.max_id is None or self.max_id is False else (struct.pack('<i', self.max_id)),
             b'' if self.read_inbox_max_id is None or self.read_inbox_max_id is False else (struct.pack('<i', self.read_inbox_max_id)),
             b'' if self.read_outbox_max_id is None or self.read_outbox_max_id is False else (struct.pack('<i', self.read_outbox_max_id)),
+            struct.pack('<i', self.unread_count),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(x._bytes() for x in self.chats),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(x._bytes() for x in self.users),
         ))
@@ -925,6 +928,7 @@ class DiscussionMessage(TLObject):
             _read_outbox_max_id = reader.read_int()
         else:
             _read_outbox_max_id = None
+        _unread_count = reader.read_int()
         reader.read_int()
         _chats = []
         for _ in range(reader.read_int()):
@@ -937,7 +941,7 @@ class DiscussionMessage(TLObject):
             _x = reader.tgread_object()
             _users.append(_x)
 
-        return cls(messages=_messages, chats=_chats, users=_users, max_id=_max_id, read_inbox_max_id=_read_inbox_max_id, read_outbox_max_id=_read_outbox_max_id)
+        return cls(messages=_messages, unread_count=_unread_count, chats=_chats, users=_users, max_id=_max_id, read_inbox_max_id=_read_inbox_max_id, read_outbox_max_id=_read_outbox_max_id)
 
 
 class ExportedChatInvite(TLObject):
@@ -1065,7 +1069,7 @@ class ExportedChatInvites(TLObject):
 
 
 class FavedStickers(TLObject):
-    CONSTRUCTOR_ID = 0xf37f2f16
+    CONSTRUCTOR_ID = 0x2cb51097
     SUBCLASS_OF_ID = 0x8e736fb9
 
     # noinspection PyShadowingBuiltins
@@ -1087,15 +1091,15 @@ class FavedStickers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x16/\x7f\xf3',
-            struct.pack('<i', self.hash),
+            b'\x97\x10\xb5,',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.packs)),b''.join(x._bytes() for x in self.packs),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.stickers)),b''.join(x._bytes() for x in self.stickers),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _packs = []
         for _ in range(reader.read_int()):
@@ -1131,7 +1135,7 @@ class FavedStickersNotModified(TLObject):
 
 
 class FeaturedStickers(TLObject):
-    CONSTRUCTOR_ID = 0xb6abc341
+    CONSTRUCTOR_ID = 0x84c02310
     SUBCLASS_OF_ID = 0x2614b722
 
     # noinspection PyShadowingBuiltins
@@ -1155,8 +1159,8 @@ class FeaturedStickers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'A\xc3\xab\xb6',
-            struct.pack('<i', self.hash),
+            b'\x10#\xc0\x84',
+            struct.pack('<q', self.hash),
             struct.pack('<i', self.count),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.sets)),b''.join(x._bytes() for x in self.sets),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.unread)),b''.join(struct.pack('<q', x) for x in self.unread),
@@ -1164,7 +1168,7 @@ class FeaturedStickers(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         _count = reader.read_int()
         reader.read_int()
         _sets = []
@@ -1210,7 +1214,7 @@ class FeaturedStickersNotModified(TLObject):
 
 
 class FoundStickerSets(TLObject):
-    CONSTRUCTOR_ID = 0x5108d648
+    CONSTRUCTOR_ID = 0x8af09dd2
     SUBCLASS_OF_ID = 0x40df361
 
     # noinspection PyShadowingBuiltins
@@ -1230,14 +1234,14 @@ class FoundStickerSets(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'H\xd6\x08Q',
-            struct.pack('<i', self.hash),
+            b'\xd2\x9d\xf0\x8a',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.sets)),b''.join(x._bytes() for x in self.sets),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _sets = []
         for _ in range(reader.read_int()):
@@ -1728,7 +1732,7 @@ class PeerDialogs(TLObject):
 
 
 class RecentStickers(TLObject):
-    CONSTRUCTOR_ID = 0x22f3afb3
+    CONSTRUCTOR_ID = 0x88d37c56
     SUBCLASS_OF_ID = 0xf76f8683
 
     # noinspection PyShadowingBuiltins
@@ -1752,8 +1756,8 @@ class RecentStickers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xb3\xaf\xf3"',
-            struct.pack('<i', self.hash),
+            b'V|\xd3\x88',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.packs)),b''.join(x._bytes() for x in self.packs),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.stickers)),b''.join(x._bytes() for x in self.stickers),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.dates)),b''.join(struct.pack('<i', x) for x in self.dates),
@@ -1761,7 +1765,7 @@ class RecentStickers(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _packs = []
         for _ in range(reader.read_int()):
@@ -1803,7 +1807,7 @@ class RecentStickersNotModified(TLObject):
 
 
 class SavedGifs(TLObject):
-    CONSTRUCTOR_ID = 0x2e0709a5
+    CONSTRUCTOR_ID = 0x84a02a0d
     SUBCLASS_OF_ID = 0xa68b61f5
 
     # noinspection PyShadowingBuiltins
@@ -1823,14 +1827,14 @@ class SavedGifs(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xa5\t\x07.',
-            struct.pack('<i', self.hash),
+            b'\r*\xa0\x84',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.gifs)),b''.join(x._bytes() for x in self.gifs),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _gifs = []
         for _ in range(reader.read_int()):
@@ -1958,6 +1962,57 @@ class SentEncryptedMessage(TLObject):
         return cls(date=_date)
 
 
+class SponsoredMessages(TLObject):
+    CONSTRUCTOR_ID = 0x65a4c7d5
+    SUBCLASS_OF_ID = 0x7f4169e0
+
+    def __init__(self, messages: List['TypeSponsoredMessage'], chats: List['TypeChat'], users: List['TypeUser']):
+        """
+        Constructor for messages.SponsoredMessages: Instance of SponsoredMessages.
+        """
+        self.messages = messages
+        self.chats = chats
+        self.users = users
+
+    def to_dict(self):
+        return {
+            '_': 'SponsoredMessages',
+            'messages': [] if self.messages is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.messages],
+            'chats': [] if self.chats is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.chats],
+            'users': [] if self.users is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.users]
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xd5\xc7\xa4e',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.messages)),b''.join(x._bytes() for x in self.messages),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(x._bytes() for x in self.chats),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(x._bytes() for x in self.users),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        reader.read_int()
+        _messages = []
+        for _ in range(reader.read_int()):
+            _x = reader.tgread_object()
+            _messages.append(_x)
+
+        reader.read_int()
+        _chats = []
+        for _ in range(reader.read_int()):
+            _x = reader.tgread_object()
+            _chats.append(_x)
+
+        reader.read_int()
+        _users = []
+        for _ in range(reader.read_int()):
+            _x = reader.tgread_object()
+            _users.append(_x)
+
+        return cls(messages=_messages, chats=_chats, users=_users)
+
+
 class StickerSet(TLObject):
     CONSTRUCTOR_ID = 0xb60a24a6
     SUBCLASS_OF_ID = 0x9b704a5a
@@ -2058,7 +2113,7 @@ class StickerSetInstallResultSuccess(TLObject):
 
 
 class Stickers(TLObject):
-    CONSTRUCTOR_ID = 0xe4599bbd
+    CONSTRUCTOR_ID = 0x30a6ec7e
     SUBCLASS_OF_ID = 0xd73bb9de
 
     # noinspection PyShadowingBuiltins
@@ -2078,14 +2133,14 @@ class Stickers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xbd\x9bY\xe4',
-            struct.pack('<i', self.hash),
+            b'~\xec\xa60',
+            struct.pack('<q', self.hash),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.stickers)),b''.join(x._bytes() for x in self.stickers),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         reader.read_int()
         _stickers = []
         for _ in range(reader.read_int()):

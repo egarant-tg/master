@@ -560,6 +560,15 @@ class ChannelPublicGroupNaError(ForbiddenError):
         return type(self), (self.request,)
 
 
+class ChannelTooLargeError(AuthKeyError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class ChatAboutNotModifiedError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -699,6 +708,15 @@ class ChatTitleEmptyError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('No chat title provided' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class ChatTooBigError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -919,6 +937,24 @@ class EmailUnconfirmedError(BadRequestError):
 
     def __reduce__(self):
         return type(self), (self.request, self.code_length)
+
+
+class EmojiInvalidError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class EmojiNotModifiedError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
 
 
 class EmoticonEmptyError(BadRequestError):
@@ -1211,6 +1247,15 @@ class FileReferenceInvalidError(BadRequestError):
         return type(self), (self.request,)
 
 
+class FileTitleEmptyError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class FirstNameInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -1334,6 +1379,15 @@ class GraphOutdatedReloadError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__("Data can't be used for the channel statistics, graphs outdated" + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class GroupcallAddParticipantsFailedError(ServerError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -1566,6 +1620,15 @@ class InterdcCallRichErrorError(ServerError):
         return type(self), (self.request, self.dc)
 
 
+class InviteForbiddenWithJoinasError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class InviteHashEmptyError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -1588,6 +1651,15 @@ class InviteHashInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('The invite hash is invalid' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class LangCodeInvalidError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -2080,6 +2152,24 @@ class PasswordMissingError(BadRequestError):
         return type(self), (self.request,)
 
 
+class PasswordRecoveryExpiredError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class PasswordRecoveryNaError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class PasswordRequiredError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -2370,6 +2460,15 @@ class PinRestrictedError(BadRequestError):
         return type(self), (self.request,)
 
 
+class PinnedDialogsTooMuchError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class PollAnswersInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -2410,6 +2509,15 @@ class PollUnsupportedError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('This layer does not support polls in the issued method' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class PollVoteRequiredError(ForbiddenError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -2461,6 +2569,15 @@ class PtsChangeEmptyError(ServerError):
         return type(self), (self.request,)
 
 
+class PublicKeyRequiredError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class QueryIdEmptyError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -2483,6 +2600,15 @@ class QueryTooShortError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('The query string is too short' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class QuizAnswerMissingError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -2618,6 +2744,15 @@ class ReplyMarkupTooLongError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('The data embedded in the reply markup buttons was too much' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class ResetRequestMissingError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -2835,6 +2970,15 @@ class ShortnameOccupyFailedError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('An error occurred when trying to register the short-name used for the sticker pack. Try a different name' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class ShortNameInvalidError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -3149,6 +3293,15 @@ class TtlDaysInvalidError(BadRequestError):
         return type(self), (self.request,)
 
 
+class TtlMediaInvalidError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('The provided media cannot be used with a TTL' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
 class TtlPeriodInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
@@ -3171,6 +3324,15 @@ class TypeConstructorInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__('The type constructor is invalid' + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class UnknownErrorError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -3270,6 +3432,15 @@ class UserAdminInvalidError(BadRequestError):
     def __init__(self, request):
         self.request = request
         super(Exception, self).__init__("Either you're not an admin or you tried to ban an admin that you didn't promote" + self._fmt_request(self.request))
+
+    def __reduce__(self):
+        return type(self), (self.request,)
+
+
+class UserAlreadyInvitedError(BadRequestError):
+    def __init__(self, request):
+        self.request = request
+        super(Exception, self).__init__('' + self._fmt_request(self.request))
 
     def __reduce__(self):
         return type(self), (self.request,)
@@ -3644,6 +3815,7 @@ rpc_errors_dict = {
     'CHANNEL_INVALID': ChannelInvalidError,
     'CHANNEL_PRIVATE': ChannelPrivateError,
     'CHANNEL_PUBLIC_GROUP_NA': ChannelPublicGroupNaError,
+    'CHANNEL_TOO_LARGE': ChannelTooLargeError,
     'CHAT_ABOUT_NOT_MODIFIED': ChatAboutNotModifiedError,
     'CHAT_ABOUT_TOO_LONG': ChatAboutTooLongError,
     'CHAT_ADMIN_INVITE_REQUIRED': ChatAdminInviteRequiredError,
@@ -3660,6 +3832,7 @@ rpc_errors_dict = {
     'CHAT_SEND_MEDIA_FORBIDDEN': ChatSendMediaForbiddenError,
     'CHAT_SEND_STICKERS_FORBIDDEN': ChatSendStickersForbiddenError,
     'CHAT_TITLE_EMPTY': ChatTitleEmptyError,
+    'CHAT_TOO_BIG': ChatTooBigError,
     'CHAT_WRITE_FORBIDDEN': ChatWriteForbiddenError,
     'CHP_CALL_FAIL': ChpCallFailError,
     'CODE_EMPTY': CodeEmptyError,
@@ -3683,6 +3856,8 @@ rpc_errors_dict = {
     'DOCUMENT_INVALID': DocumentInvalidError,
     'EMAIL_HASH_EXPIRED': EmailHashExpiredError,
     'EMAIL_INVALID': EmailInvalidError,
+    'EMOJI_INVALID': EmojiInvalidError,
+    'EMOJI_NOT_MODIFIED': EmojiNotModifiedError,
     'EMOTICON_EMPTY': EmoticonEmptyError,
     'EMOTICON_INVALID': EmoticonInvalidError,
     'EMOTICON_STICKERPACK_MISSING': EmoticonStickerpackMissingError,
@@ -3713,6 +3888,7 @@ rpc_errors_dict = {
     'FILE_REFERENCE_EMPTY': FileReferenceEmptyError,
     'FILE_REFERENCE_EXPIRED': FileReferenceExpiredError,
     'FILE_REFERENCE_INVALID': FileReferenceInvalidError,
+    'FILE_TITLE_EMPTY': FileTitleEmptyError,
     'FIRSTNAME_INVALID': FirstNameInvalidError,
     'FOLDER_ID_EMPTY': FolderIdEmptyError,
     'FOLDER_ID_INVALID': FolderIdInvalidError,
@@ -3725,6 +3901,7 @@ rpc_errors_dict = {
     'GIF_ID_INVALID': GifIdInvalidError,
     'GRAPH_INVALID_RELOAD': GraphInvalidReloadError,
     'GRAPH_OUTDATED_RELOAD': GraphOutdatedReloadError,
+    'GROUPCALL_ADD_PARTICIPANTS_FAILED': GroupcallAddParticipantsFailedError,
     'GROUPCALL_ALREADY_DISCARDED': GroupcallAlreadyDiscardedError,
     'GROUPCALL_FORBIDDEN': GroupcallForbiddenError,
     'GROUPCALL_JOIN_MISSING': GroupcallJoinMissingError,
@@ -3748,9 +3925,11 @@ rpc_errors_dict = {
     'INPUT_METHOD_INVALID': InputMethodInvalidError,
     'INPUT_REQUEST_TOO_LONG': InputRequestTooLongError,
     'INPUT_USER_DEACTIVATED': InputUserDeactivatedError,
+    'INVITE_FORBIDDEN_WITH_JOINAS': InviteForbiddenWithJoinasError,
     'INVITE_HASH_EMPTY': InviteHashEmptyError,
     'INVITE_HASH_EXPIRED': InviteHashExpiredError,
     'INVITE_HASH_INVALID': InviteHashInvalidError,
+    'LANG_CODE_INVALID': LangCodeInvalidError,
     'LANG_PACK_INVALID': LangPackInvalidError,
     'LASTNAME_INVALID': LastnameInvalidError,
     'LIMIT_INVALID': LimitInvalidError,
@@ -3804,6 +3983,8 @@ rpc_errors_dict = {
     'PASSWORD_EMPTY': PasswordEmptyError,
     'PASSWORD_HASH_INVALID': PasswordHashInvalidError,
     'PASSWORD_MISSING': PasswordMissingError,
+    'PASSWORD_RECOVERY_EXPIRED': PasswordRecoveryExpiredError,
+    'PASSWORD_RECOVERY_NA': PasswordRecoveryNaError,
     'PASSWORD_REQUIRED': PasswordRequiredError,
     'PAYMENT_PROVIDER_INVALID': PaymentProviderInvalidError,
     'PEER_FLOOD': PeerFloodError,
@@ -3834,18 +4015,22 @@ rpc_errors_dict = {
     'PHOTO_SAVE_FILE_INVALID': PhotoSaveFileInvalidError,
     'PHOTO_THUMB_URL_EMPTY': PhotoThumbUrlEmptyError,
     'PIN_RESTRICTED': PinRestrictedError,
+    'PINNED_DIALOGS_TOO_MUCH': PinnedDialogsTooMuchError,
     'POLL_ANSWERS_INVALID': PollAnswersInvalidError,
     'POLL_OPTION_DUPLICATE': PollOptionDuplicateError,
     'POLL_OPTION_INVALID': PollOptionInvalidError,
     'POLL_QUESTION_INVALID': PollQuestionInvalidError,
     'POLL_UNSUPPORTED': PollUnsupportedError,
+    'POLL_VOTE_REQUIRED': PollVoteRequiredError,
     'PRIVACY_KEY_INVALID': PrivacyKeyInvalidError,
     'PRIVACY_TOO_LONG': PrivacyTooLongError,
     'PRIVACY_VALUE_INVALID': PrivacyValueInvalidError,
     'PTS_CHANGE_EMPTY': PtsChangeEmptyError,
+    'PUBLIC_KEY_REQUIRED': PublicKeyRequiredError,
     'QUERY_ID_EMPTY': QueryIdEmptyError,
     'QUERY_ID_INVALID': QueryIdInvalidError,
     'QUERY_TOO_SHORT': QueryTooShortError,
+    'QUIZ_ANSWER_MISSING': QuizAnswerMissingError,
     'QUIZ_CORRECT_ANSWERS_EMPTY': QuizCorrectAnswersEmptyError,
     'QUIZ_CORRECT_ANSWERS_TOO_MUCH': QuizCorrectAnswersTooMuchError,
     'QUIZ_CORRECT_ANSWER_INVALID': QuizCorrectAnswerInvalidError,
@@ -3861,6 +4046,7 @@ rpc_errors_dict = {
     'REPLY_MARKUP_GAME_EMPTY': ReplyMarkupGameEmptyError,
     'REPLY_MARKUP_INVALID': ReplyMarkupInvalidError,
     'REPLY_MARKUP_TOO_LONG': ReplyMarkupTooLongError,
+    'RESET_REQUEST_MISSING': ResetRequestMissingError,
     'RESULTS_TOO_MUCH': ResultsTooMuchError,
     'RESULT_ID_DUPLICATE': ResultIdDuplicateError,
     'RESULT_ID_INVALID': ResultIdInvalidError,
@@ -3884,6 +4070,7 @@ rpc_errors_dict = {
     'SESSION_REVOKED': SessionRevokedError,
     'SHA256_HASH_INVALID': Sha256HashInvalidError,
     'SHORTNAME_OCCUPY_FAILED': ShortnameOccupyFailedError,
+    'SHORT_NAME_INVALID': ShortNameInvalidError,
     'SHORT_NAME_OCCUPIED': ShortNameOccupiedError,
     'SRP_ID_INVALID': SrpIdInvalidError,
     'START_PARAM_EMPTY': StartParamEmptyError,
@@ -3915,9 +4102,11 @@ rpc_errors_dict = {
     'TMP_PASSWORD_INVALID': TmpPasswordInvalidError,
     'TOKEN_INVALID': TokenInvalidError,
     'TTL_DAYS_INVALID': TtlDaysInvalidError,
+    'TTL_MEDIA_INVALID': TtlMediaInvalidError,
     'TTL_PERIOD_INVALID': TtlPeriodInvalidError,
     'TYPES_EMPTY': TypesEmptyError,
     'TYPE_CONSTRUCTOR_INVALID': TypeConstructorInvalidError,
+    'UNKNOWN_ERROR': UnknownErrorError,
     'UNKNOWN_METHOD': UnknownMethodError,
     'UNTIL_DATE_INVALID': UntilDateInvalidError,
     'URL_INVALID': UrlInvalidError,
@@ -3929,6 +4118,7 @@ rpc_errors_dict = {
     'USERS_TOO_FEW': UsersTooFewError,
     'USERS_TOO_MUCH': UsersTooMuchError,
     'USER_ADMIN_INVALID': UserAdminInvalidError,
+    'USER_ALREADY_INVITED': UserAlreadyInvitedError,
     'USER_ALREADY_PARTICIPANT': UserAlreadyParticipantError,
     'USER_BANNED_IN_CHANNEL': UserBannedInChannelError,
     'USER_BLOCKED': UserBlockedError,

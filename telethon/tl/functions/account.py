@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class AcceptAuthorizationRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xe7027c94
+    CONSTRUCTOR_ID = 0xf3ed4c73
     SUBCLASS_OF_ID = 0xf5b399ac
 
     def __init__(self, bot_id: int, scope: str, public_key: str, value_hashes: List['TypeSecureValueHash'], credentials: 'TypeSecureCredentialsEncrypted'):
@@ -37,8 +37,8 @@ class AcceptAuthorizationRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\x94|\x02\xe7',
-            struct.pack('<i', self.bot_id),
+            b'sL\xed\xf3',
+            struct.pack('<q', self.bot_id),
             self.serialize_bytes(self.scope),
             self.serialize_bytes(self.public_key),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.value_hashes)),b''.join(x._bytes() for x in self.value_hashes),
@@ -47,7 +47,7 @@ class AcceptAuthorizationRequest(TLRequest):
 
     @classmethod
     def from_reader(cls, reader):
-        _bot_id = reader.read_int()
+        _bot_id = reader.read_long()
         _scope = reader.tgread_string()
         _public_key = reader.tgread_string()
         reader.read_int()
@@ -256,6 +256,25 @@ class CreateThemeRequest(TLRequest):
         return cls(slug=_slug, title=_title, document=_document, settings=_settings)
 
 
+class DeclinePasswordResetRequest(TLRequest):
+    CONSTRUCTOR_ID = 0x4c9409f6
+    SUBCLASS_OF_ID = 0xf5b399ac
+
+    def to_dict(self):
+        return {
+            '_': 'DeclinePasswordResetRequest'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xf6\t\x94L',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
 class DeleteAccountRequest(TLRequest):
     CONSTRUCTOR_ID = 0x418d4e0b
     SUBCLASS_OF_ID = 0xf5b399ac
@@ -386,7 +405,7 @@ class GetAllSecureValuesRequest(TLRequest):
 
 
 class GetAuthorizationFormRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xb86ba8e1
+    CONSTRUCTOR_ID = 0xa929597a
     SUBCLASS_OF_ID = 0x78049a94
 
     def __init__(self, bot_id: int, scope: str, public_key: str):
@@ -407,15 +426,15 @@ class GetAuthorizationFormRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xe1\xa8k\xb8',
-            struct.pack('<i', self.bot_id),
+            b'zY)\xa9',
+            struct.pack('<q', self.bot_id),
             self.serialize_bytes(self.scope),
             self.serialize_bytes(self.public_key),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _bot_id = reader.read_int()
+        _bot_id = reader.read_long()
         _scope = reader.tgread_string()
         _public_key = reader.tgread_string()
         return cls(bot_id=_bot_id, scope=_scope, public_key=_public_key)
@@ -457,6 +476,35 @@ class GetAutoDownloadSettingsRequest(TLRequest):
     @classmethod
     def from_reader(cls, reader):
         return cls()
+
+
+class GetChatThemesRequest(TLRequest):
+    CONSTRUCTOR_ID = 0xd6d71d7b
+    SUBCLASS_OF_ID = 0x15c14aa8
+
+    # noinspection PyShadowingBuiltins
+    def __init__(self, hash: int):
+        """
+        :returns account.ChatThemes: Instance of either ChatThemesNotModified, ChatThemes.
+        """
+        self.hash = hash
+
+    def to_dict(self):
+        return {
+            '_': 'GetChatThemesRequest',
+            'hash': self.hash
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'{\x1d\xd7\xd6',
+            struct.pack('<i', self.hash),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _hash = reader.read_int()
+        return cls(hash=_hash)
 
 
 class GetContactSignUpNotificationRequest(TLRequest):
@@ -767,7 +815,7 @@ class GetThemeRequest(TLRequest):
 
 
 class GetThemesRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x285946f8
+    CONSTRUCTOR_ID = 0x7206e458
     SUBCLASS_OF_ID = 0x7fc52204
 
     # noinspection PyShadowingBuiltins
@@ -787,15 +835,15 @@ class GetThemesRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xf8FY(',
+            b'X\xe4\x06r',
             self.serialize_bytes(self.format),
-            struct.pack('<i', self.hash),
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _format = reader.tgread_string()
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(format=_format, hash=_hash)
 
 
@@ -860,7 +908,7 @@ class GetWallPaperRequest(TLRequest):
 
 
 class GetWallPapersRequest(TLRequest):
-    CONSTRUCTOR_ID = 0xaabb1763
+    CONSTRUCTOR_ID = 0x7967d36
     SUBCLASS_OF_ID = 0xa2c548fd
 
     # noinspection PyShadowingBuiltins
@@ -878,13 +926,13 @@ class GetWallPapersRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'c\x17\xbb\xaa',
-            struct.pack('<i', self.hash),
+            b'6}\x96\x07',
+            struct.pack('<q', self.hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _hash = reader.read_int()
+        _hash = reader.read_long()
         return cls(hash=_hash)
 
 
@@ -1039,7 +1087,7 @@ class InstallWallPaperRequest(TLRequest):
 
 
 class RegisterDeviceRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x68976c6f
+    CONSTRUCTOR_ID = 0xec86017a
     SUBCLASS_OF_ID = 0xf5b399ac
 
     def __init__(self, token_type: int, token: str, app_sandbox: bool, secret: bytes, other_uids: List[int], no_muted: Optional[bool]=None):
@@ -1066,13 +1114,13 @@ class RegisterDeviceRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'ol\x97h',
+            b'z\x01\x86\xec',
             struct.pack('<I', (0 if self.no_muted is None or self.no_muted is False else 1)),
             struct.pack('<i', self.token_type),
             self.serialize_bytes(self.token),
             b'\xb5ur\x99' if self.app_sandbox else b'7\x97y\xbc',
             self.serialize_bytes(self.secret),
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.other_uids)),b''.join(struct.pack('<i', x) for x in self.other_uids),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.other_uids)),b''.join(struct.pack('<q', x) for x in self.other_uids),
         ))
 
     @classmethod
@@ -1087,7 +1135,7 @@ class RegisterDeviceRequest(TLRequest):
         reader.read_int()
         _other_uids = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _other_uids.append(_x)
 
         return cls(token_type=_token_type, token=_token, app_sandbox=_app_sandbox, secret=_secret, other_uids=_other_uids, no_muted=_no_muted)
@@ -1236,6 +1284,25 @@ class ResetNotifySettingsRequest(TLRequest):
     def _bytes(self):
         return b''.join((
             b'G\x17~\xdb',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
+class ResetPasswordRequest(TLRequest):
+    CONSTRUCTOR_ID = 0x9308ce1b
+    SUBCLASS_OF_ID = 0x49507416
+
+    def to_dict(self):
+        return {
+            '_': 'ResetPasswordRequest'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\x1b\xce\x08\x93',
         ))
 
     @classmethod
@@ -1724,7 +1791,7 @@ class SetPrivacyRequest(TLRequest):
 
 
 class UnregisterDeviceRequest(TLRequest):
-    CONSTRUCTOR_ID = 0x3076c4bf
+    CONSTRUCTOR_ID = 0x6a0d3206
     SUBCLASS_OF_ID = 0xf5b399ac
 
     def __init__(self, token_type: int, token: str, other_uids: List[int]):
@@ -1745,10 +1812,10 @@ class UnregisterDeviceRequest(TLRequest):
 
     def _bytes(self):
         return b''.join((
-            b'\xbf\xc4v0',
+            b'\x062\rj',
             struct.pack('<i', self.token_type),
             self.serialize_bytes(self.token),
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.other_uids)),b''.join(struct.pack('<i', x) for x in self.other_uids),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.other_uids)),b''.join(struct.pack('<q', x) for x in self.other_uids),
         ))
 
     @classmethod
@@ -1758,7 +1825,7 @@ class UnregisterDeviceRequest(TLRequest):
         reader.read_int()
         _other_uids = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _other_uids.append(_x)
 
         return cls(token_type=_token_type, token=_token, other_uids=_other_uids)

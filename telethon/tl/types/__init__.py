@@ -662,7 +662,7 @@ class BotCommandScopeUsers(TLObject):
 
 
 class BotInfo(TLObject):
-    CONSTRUCTOR_ID = 0x98e81d3a
+    CONSTRUCTOR_ID = 0x1b74b335
     SUBCLASS_OF_ID = 0xf1f701db
 
     def __init__(self, user_id: int, description: str, commands: List['TypeBotCommand']):
@@ -683,15 +683,15 @@ class BotInfo(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b':\x1d\xe8\x98',
-            struct.pack('<I', self.user_id),
+            b'5\xb3t\x1b',
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.description),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.commands)),b''.join(x._bytes() for x in self.commands),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _description = reader.tgread_string()
         reader.read_int()
         _commands = []
@@ -1244,11 +1244,11 @@ class CdnPublicKey(TLObject):
 
 
 class Channel(TLObject):
-    CONSTRUCTOR_ID = 0xd31a961e
+    CONSTRUCTOR_ID = 0x8261ac61
     SUBCLASS_OF_ID = 0xc5af5d94
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, id: int, title: str, photo: 'TypeChatPhoto', date: Optional[datetime], version: int, creator: Optional[bool]=None, left: Optional[bool]=None, broadcast: Optional[bool]=None, verified: Optional[bool]=None, megagroup: Optional[bool]=None, restricted: Optional[bool]=None, signatures: Optional[bool]=None, min: Optional[bool]=None, scam: Optional[bool]=None, has_link: Optional[bool]=None, has_geo: Optional[bool]=None, slowmode_enabled: Optional[bool]=None, call_active: Optional[bool]=None, call_not_empty: Optional[bool]=None, fake: Optional[bool]=None, gigagroup: Optional[bool]=None, access_hash: Optional[int]=None, username: Optional[str]=None, restriction_reason: Optional[List['TypeRestrictionReason']]=None, admin_rights: Optional['TypeChatAdminRights']=None, banned_rights: Optional['TypeChatBannedRights']=None, default_banned_rights: Optional['TypeChatBannedRights']=None, participants_count: Optional[int]=None):
+    def __init__(self, id: int, title: str, photo: 'TypeChatPhoto', date: Optional[datetime], creator: Optional[bool]=None, left: Optional[bool]=None, broadcast: Optional[bool]=None, verified: Optional[bool]=None, megagroup: Optional[bool]=None, restricted: Optional[bool]=None, signatures: Optional[bool]=None, min: Optional[bool]=None, scam: Optional[bool]=None, has_link: Optional[bool]=None, has_geo: Optional[bool]=None, slowmode_enabled: Optional[bool]=None, call_active: Optional[bool]=None, call_not_empty: Optional[bool]=None, fake: Optional[bool]=None, gigagroup: Optional[bool]=None, access_hash: Optional[int]=None, username: Optional[str]=None, restriction_reason: Optional[List['TypeRestrictionReason']]=None, admin_rights: Optional['TypeChatAdminRights']=None, banned_rights: Optional['TypeChatBannedRights']=None, default_banned_rights: Optional['TypeChatBannedRights']=None, participants_count: Optional[int]=None):
         """
         Constructor for Chat: Instance of either ChatEmpty, Chat, ChatForbidden, Channel, ChannelForbidden.
         """
@@ -1256,7 +1256,6 @@ class Channel(TLObject):
         self.title = title
         self.photo = photo
         self.date = date
-        self.version = version
         self.creator = creator
         self.left = left
         self.broadcast = broadcast
@@ -1288,7 +1287,6 @@ class Channel(TLObject):
             'title': self.title,
             'photo': self.photo.to_dict() if isinstance(self.photo, TLObject) else self.photo,
             'date': self.date,
-            'version': self.version,
             'creator': self.creator,
             'left': self.left,
             'broadcast': self.broadcast,
@@ -1317,15 +1315,14 @@ class Channel(TLObject):
     def _bytes(self):
         assert ((self.restricted or self.restricted is not None) and (self.restriction_reason or self.restriction_reason is not None)) or ((self.restricted is None or self.restricted is False) and (self.restriction_reason is None or self.restriction_reason is False)), 'restricted, restriction_reason parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\x1e\x96\x1a\xd3',
+            b'a\xaca\x82',
             struct.pack('<I', (0 if self.creator is None or self.creator is False else 1) | (0 if self.left is None or self.left is False else 4) | (0 if self.broadcast is None or self.broadcast is False else 32) | (0 if self.verified is None or self.verified is False else 128) | (0 if self.megagroup is None or self.megagroup is False else 256) | (0 if self.restricted is None or self.restricted is False else 512) | (0 if self.signatures is None or self.signatures is False else 2048) | (0 if self.min is None or self.min is False else 4096) | (0 if self.scam is None or self.scam is False else 524288) | (0 if self.has_link is None or self.has_link is False else 1048576) | (0 if self.has_geo is None or self.has_geo is False else 2097152) | (0 if self.slowmode_enabled is None or self.slowmode_enabled is False else 4194304) | (0 if self.call_active is None or self.call_active is False else 8388608) | (0 if self.call_not_empty is None or self.call_not_empty is False else 16777216) | (0 if self.fake is None or self.fake is False else 33554432) | (0 if self.gigagroup is None or self.gigagroup is False else 67108864) | (0 if self.access_hash is None or self.access_hash is False else 8192) | (0 if self.username is None or self.username is False else 64) | (0 if self.restriction_reason is None or self.restriction_reason is False else 512) | (0 if self.admin_rights is None or self.admin_rights is False else 16384) | (0 if self.banned_rights is None or self.banned_rights is False else 32768) | (0 if self.default_banned_rights is None or self.default_banned_rights is False else 262144) | (0 if self.participants_count is None or self.participants_count is False else 131072)),
-            struct.pack('<i', self.id),
+            struct.pack('<q', self.id),
             b'' if self.access_hash is None or self.access_hash is False else (struct.pack('<q', self.access_hash)),
             self.serialize_bytes(self.title),
             b'' if self.username is None or self.username is False else (self.serialize_bytes(self.username)),
             self.photo._bytes(),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.version),
             b'' if self.restriction_reason is None or self.restriction_reason is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.restriction_reason)),b''.join(x._bytes() for x in self.restriction_reason))),
             b'' if self.admin_rights is None or self.admin_rights is False else (self.admin_rights._bytes()),
             b'' if self.banned_rights is None or self.banned_rights is False else (self.banned_rights._bytes()),
@@ -1353,7 +1350,7 @@ class Channel(TLObject):
         _call_not_empty = bool(flags & 16777216)
         _fake = bool(flags & 33554432)
         _gigagroup = bool(flags & 67108864)
-        _id = reader.read_int()
+        _id = reader.read_long()
         if flags & 8192:
             _access_hash = reader.read_long()
         else:
@@ -1365,7 +1362,6 @@ class Channel(TLObject):
             _username = None
         _photo = reader.tgread_object()
         _date = reader.tgread_date()
-        _version = reader.read_int()
         if flags & 512:
             reader.read_int()
             _restriction_reason = []
@@ -1391,11 +1387,11 @@ class Channel(TLObject):
             _participants_count = reader.read_int()
         else:
             _participants_count = None
-        return cls(id=_id, title=_title, photo=_photo, date=_date, version=_version, creator=_creator, left=_left, broadcast=_broadcast, verified=_verified, megagroup=_megagroup, restricted=_restricted, signatures=_signatures, min=_min, scam=_scam, has_link=_has_link, has_geo=_has_geo, slowmode_enabled=_slowmode_enabled, call_active=_call_active, call_not_empty=_call_not_empty, fake=_fake, gigagroup=_gigagroup, access_hash=_access_hash, username=_username, restriction_reason=_restriction_reason, admin_rights=_admin_rights, banned_rights=_banned_rights, default_banned_rights=_default_banned_rights, participants_count=_participants_count)
+        return cls(id=_id, title=_title, photo=_photo, date=_date, creator=_creator, left=_left, broadcast=_broadcast, verified=_verified, megagroup=_megagroup, restricted=_restricted, signatures=_signatures, min=_min, scam=_scam, has_link=_has_link, has_geo=_has_geo, slowmode_enabled=_slowmode_enabled, call_active=_call_active, call_not_empty=_call_not_empty, fake=_fake, gigagroup=_gigagroup, access_hash=_access_hash, username=_username, restriction_reason=_restriction_reason, admin_rights=_admin_rights, banned_rights=_banned_rights, default_banned_rights=_default_banned_rights, participants_count=_participants_count)
 
 
 class ChannelAdminLogEvent(TLObject):
-    CONSTRUCTOR_ID = 0x3b5a3e40
+    CONSTRUCTOR_ID = 0x1fad68cd
     SUBCLASS_OF_ID = 0x408f0999
 
     # noinspection PyShadowingBuiltins
@@ -1419,10 +1415,10 @@ class ChannelAdminLogEvent(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'@>Z;',
+            b'\xcdh\xad\x1f',
             struct.pack('<q', self.id),
             self.serialize_datetime(self.date),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.action._bytes(),
         ))
 
@@ -1430,7 +1426,7 @@ class ChannelAdminLogEvent(TLObject):
     def from_reader(cls, reader):
         _id = reader.read_long()
         _date = reader.tgread_date()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _action = reader.tgread_object()
         return cls(id=_id, date=_date, user_id=_user_id, action=_action)
 
@@ -1500,7 +1496,7 @@ class ChannelAdminLogEventActionChangeHistoryTTL(TLObject):
 
 
 class ChannelAdminLogEventActionChangeLinkedChat(TLObject):
-    CONSTRUCTOR_ID = 0xa26f881b
+    CONSTRUCTOR_ID = 0x50c7ac8
     SUBCLASS_OF_ID = 0xb2b987f3
 
     def __init__(self, prev_value: int, new_value: int):
@@ -1519,15 +1515,15 @@ class ChannelAdminLogEventActionChangeLinkedChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x1b\x88o\xa2',
-            struct.pack('<i', self.prev_value),
-            struct.pack('<i', self.new_value),
+            b'\xc8z\x0c\x05',
+            struct.pack('<q', self.prev_value),
+            struct.pack('<q', self.new_value),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _prev_value = reader.read_int()
-        _new_value = reader.read_int()
+        _prev_value = reader.read_long()
+        _new_value = reader.read_long()
         return cls(prev_value=_prev_value, new_value=_new_value)
 
 
@@ -2445,7 +2441,7 @@ class ChannelAdminLogEventsFilter(TLObject):
 
 
 class ChannelForbidden(TLObject):
-    CONSTRUCTOR_ID = 0x289da732
+    CONSTRUCTOR_ID = 0x17d493d5
     SUBCLASS_OF_ID = 0xc5af5d94
 
     # noinspection PyShadowingBuiltins
@@ -2473,9 +2469,9 @@ class ChannelForbidden(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'2\xa7\x9d(',
+            b'\xd5\x93\xd4\x17',
             struct.pack('<I', (0 if self.broadcast is None or self.broadcast is False else 32) | (0 if self.megagroup is None or self.megagroup is False else 256) | (0 if self.until_date is None or self.until_date is False else 65536)),
-            struct.pack('<i', self.id),
+            struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_bytes(self.title),
             b'' if self.until_date is None or self.until_date is False else (self.serialize_datetime(self.until_date)),
@@ -2487,7 +2483,7 @@ class ChannelForbidden(TLObject):
 
         _broadcast = bool(flags & 32)
         _megagroup = bool(flags & 256)
-        _id = reader.read_int()
+        _id = reader.read_long()
         _access_hash = reader.read_long()
         _title = reader.tgread_string()
         if flags & 65536:
@@ -2498,11 +2494,11 @@ class ChannelForbidden(TLObject):
 
 
 class ChannelFull(TLObject):
-    CONSTRUCTOR_ID = 0x548c3f93
+    CONSTRUCTOR_ID = 0xe9b27a17
     SUBCLASS_OF_ID = 0xd49a2697
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, id: int, about: str, read_inbox_max_id: int, read_outbox_max_id: int, unread_count: int, chat_photo: 'TypePhoto', notify_settings: 'TypePeerNotifySettings', bot_info: List['TypeBotInfo'], pts: int, can_view_participants: Optional[bool]=None, can_set_username: Optional[bool]=None, can_set_stickers: Optional[bool]=None, hidden_prehistory: Optional[bool]=None, can_set_location: Optional[bool]=None, has_scheduled: Optional[bool]=None, can_view_stats: Optional[bool]=None, blocked: Optional[bool]=None, participants_count: Optional[int]=None, admins_count: Optional[int]=None, kicked_count: Optional[int]=None, banned_count: Optional[int]=None, online_count: Optional[int]=None, exported_invite: Optional['TypeExportedChatInvite']=None, migrated_from_chat_id: Optional[int]=None, migrated_from_max_id: Optional[int]=None, pinned_msg_id: Optional[int]=None, stickerset: Optional['TypeStickerSet']=None, available_min_id: Optional[int]=None, folder_id: Optional[int]=None, linked_chat_id: Optional[int]=None, location: Optional['TypeChannelLocation']=None, slowmode_seconds: Optional[int]=None, slowmode_next_send_date: Optional[datetime]=None, stats_dc: Optional[int]=None, call: Optional['TypeInputGroupCall']=None, ttl_period: Optional[int]=None, pending_suggestions: Optional[List[str]]=None, groupcall_default_join_as: Optional['TypePeer']=None):
+    def __init__(self, id: int, about: str, read_inbox_max_id: int, read_outbox_max_id: int, unread_count: int, chat_photo: 'TypePhoto', notify_settings: 'TypePeerNotifySettings', bot_info: List['TypeBotInfo'], pts: int, can_view_participants: Optional[bool]=None, can_set_username: Optional[bool]=None, can_set_stickers: Optional[bool]=None, hidden_prehistory: Optional[bool]=None, can_set_location: Optional[bool]=None, has_scheduled: Optional[bool]=None, can_view_stats: Optional[bool]=None, blocked: Optional[bool]=None, participants_count: Optional[int]=None, admins_count: Optional[int]=None, kicked_count: Optional[int]=None, banned_count: Optional[int]=None, online_count: Optional[int]=None, exported_invite: Optional['TypeExportedChatInvite']=None, migrated_from_chat_id: Optional[int]=None, migrated_from_max_id: Optional[int]=None, pinned_msg_id: Optional[int]=None, stickerset: Optional['TypeStickerSet']=None, available_min_id: Optional[int]=None, folder_id: Optional[int]=None, linked_chat_id: Optional[int]=None, location: Optional['TypeChannelLocation']=None, slowmode_seconds: Optional[int]=None, slowmode_next_send_date: Optional[datetime]=None, stats_dc: Optional[int]=None, call: Optional['TypeInputGroupCall']=None, ttl_period: Optional[int]=None, pending_suggestions: Optional[List[str]]=None, groupcall_default_join_as: Optional['TypePeer']=None, theme_emoticon: Optional[str]=None):
         """
         Constructor for ChatFull: Instance of either ChatFull, ChannelFull.
         """
@@ -2544,6 +2540,7 @@ class ChannelFull(TLObject):
         self.ttl_period = ttl_period
         self.pending_suggestions = pending_suggestions
         self.groupcall_default_join_as = groupcall_default_join_as
+        self.theme_emoticon = theme_emoticon
 
     def to_dict(self):
         return {
@@ -2585,16 +2582,17 @@ class ChannelFull(TLObject):
             'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call,
             'ttl_period': self.ttl_period,
             'pending_suggestions': [] if self.pending_suggestions is None else self.pending_suggestions[:],
-            'groupcall_default_join_as': self.groupcall_default_join_as.to_dict() if isinstance(self.groupcall_default_join_as, TLObject) else self.groupcall_default_join_as
+            'groupcall_default_join_as': self.groupcall_default_join_as.to_dict() if isinstance(self.groupcall_default_join_as, TLObject) else self.groupcall_default_join_as,
+            'theme_emoticon': self.theme_emoticon
         }
 
     def _bytes(self):
         assert ((self.kicked_count or self.kicked_count is not None) and (self.banned_count or self.banned_count is not None)) or ((self.kicked_count is None or self.kicked_count is False) and (self.banned_count is None or self.banned_count is False)), 'kicked_count, banned_count parameters must all be False-y (like None) or all me True-y'
         assert ((self.migrated_from_chat_id or self.migrated_from_chat_id is not None) and (self.migrated_from_max_id or self.migrated_from_max_id is not None)) or ((self.migrated_from_chat_id is None or self.migrated_from_chat_id is False) and (self.migrated_from_max_id is None or self.migrated_from_max_id is False)), 'migrated_from_chat_id, migrated_from_max_id parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\x93?\x8cT',
-            struct.pack('<I', (0 if self.can_view_participants is None or self.can_view_participants is False else 8) | (0 if self.can_set_username is None or self.can_set_username is False else 64) | (0 if self.can_set_stickers is None or self.can_set_stickers is False else 128) | (0 if self.hidden_prehistory is None or self.hidden_prehistory is False else 1024) | (0 if self.can_set_location is None or self.can_set_location is False else 65536) | (0 if self.has_scheduled is None or self.has_scheduled is False else 524288) | (0 if self.can_view_stats is None or self.can_view_stats is False else 1048576) | (0 if self.blocked is None or self.blocked is False else 4194304) | (0 if self.participants_count is None or self.participants_count is False else 1) | (0 if self.admins_count is None or self.admins_count is False else 2) | (0 if self.kicked_count is None or self.kicked_count is False else 4) | (0 if self.banned_count is None or self.banned_count is False else 4) | (0 if self.online_count is None or self.online_count is False else 8192) | (0 if self.exported_invite is None or self.exported_invite is False else 8388608) | (0 if self.migrated_from_chat_id is None or self.migrated_from_chat_id is False else 16) | (0 if self.migrated_from_max_id is None or self.migrated_from_max_id is False else 16) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 32) | (0 if self.stickerset is None or self.stickerset is False else 256) | (0 if self.available_min_id is None or self.available_min_id is False else 512) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.linked_chat_id is None or self.linked_chat_id is False else 16384) | (0 if self.location is None or self.location is False else 32768) | (0 if self.slowmode_seconds is None or self.slowmode_seconds is False else 131072) | (0 if self.slowmode_next_send_date is None or self.slowmode_next_send_date is False else 262144) | (0 if self.stats_dc is None or self.stats_dc is False else 4096) | (0 if self.call is None or self.call is False else 2097152) | (0 if self.ttl_period is None or self.ttl_period is False else 16777216) | (0 if self.pending_suggestions is None or self.pending_suggestions is False else 33554432) | (0 if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else 67108864)),
-            struct.pack('<i', self.id),
+            b'\x17z\xb2\xe9',
+            struct.pack('<I', (0 if self.can_view_participants is None or self.can_view_participants is False else 8) | (0 if self.can_set_username is None or self.can_set_username is False else 64) | (0 if self.can_set_stickers is None or self.can_set_stickers is False else 128) | (0 if self.hidden_prehistory is None or self.hidden_prehistory is False else 1024) | (0 if self.can_set_location is None or self.can_set_location is False else 65536) | (0 if self.has_scheduled is None or self.has_scheduled is False else 524288) | (0 if self.can_view_stats is None or self.can_view_stats is False else 1048576) | (0 if self.blocked is None or self.blocked is False else 4194304) | (0 if self.participants_count is None or self.participants_count is False else 1) | (0 if self.admins_count is None or self.admins_count is False else 2) | (0 if self.kicked_count is None or self.kicked_count is False else 4) | (0 if self.banned_count is None or self.banned_count is False else 4) | (0 if self.online_count is None or self.online_count is False else 8192) | (0 if self.exported_invite is None or self.exported_invite is False else 8388608) | (0 if self.migrated_from_chat_id is None or self.migrated_from_chat_id is False else 16) | (0 if self.migrated_from_max_id is None or self.migrated_from_max_id is False else 16) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 32) | (0 if self.stickerset is None or self.stickerset is False else 256) | (0 if self.available_min_id is None or self.available_min_id is False else 512) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.linked_chat_id is None or self.linked_chat_id is False else 16384) | (0 if self.location is None or self.location is False else 32768) | (0 if self.slowmode_seconds is None or self.slowmode_seconds is False else 131072) | (0 if self.slowmode_next_send_date is None or self.slowmode_next_send_date is False else 262144) | (0 if self.stats_dc is None or self.stats_dc is False else 4096) | (0 if self.call is None or self.call is False else 2097152) | (0 if self.ttl_period is None or self.ttl_period is False else 16777216) | (0 if self.pending_suggestions is None or self.pending_suggestions is False else 33554432) | (0 if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else 67108864) | (0 if self.theme_emoticon is None or self.theme_emoticon is False else 134217728)),
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.about),
             b'' if self.participants_count is None or self.participants_count is False else (struct.pack('<i', self.participants_count)),
             b'' if self.admins_count is None or self.admins_count is False else (struct.pack('<i', self.admins_count)),
@@ -2608,13 +2606,13 @@ class ChannelFull(TLObject):
             self.notify_settings._bytes(),
             b'' if self.exported_invite is None or self.exported_invite is False else (self.exported_invite._bytes()),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.bot_info)),b''.join(x._bytes() for x in self.bot_info),
-            b'' if self.migrated_from_chat_id is None or self.migrated_from_chat_id is False else (struct.pack('<i', self.migrated_from_chat_id)),
+            b'' if self.migrated_from_chat_id is None or self.migrated_from_chat_id is False else (struct.pack('<q', self.migrated_from_chat_id)),
             b'' if self.migrated_from_max_id is None or self.migrated_from_max_id is False else (struct.pack('<i', self.migrated_from_max_id)),
             b'' if self.pinned_msg_id is None or self.pinned_msg_id is False else (struct.pack('<i', self.pinned_msg_id)),
             b'' if self.stickerset is None or self.stickerset is False else (self.stickerset._bytes()),
             b'' if self.available_min_id is None or self.available_min_id is False else (struct.pack('<i', self.available_min_id)),
             b'' if self.folder_id is None or self.folder_id is False else (struct.pack('<i', self.folder_id)),
-            b'' if self.linked_chat_id is None or self.linked_chat_id is False else (struct.pack('<i', self.linked_chat_id)),
+            b'' if self.linked_chat_id is None or self.linked_chat_id is False else (struct.pack('<q', self.linked_chat_id)),
             b'' if self.location is None or self.location is False else (self.location._bytes()),
             b'' if self.slowmode_seconds is None or self.slowmode_seconds is False else (struct.pack('<i', self.slowmode_seconds)),
             b'' if self.slowmode_next_send_date is None or self.slowmode_next_send_date is False else (self.serialize_datetime(self.slowmode_next_send_date)),
@@ -2624,6 +2622,7 @@ class ChannelFull(TLObject):
             b'' if self.ttl_period is None or self.ttl_period is False else (struct.pack('<i', self.ttl_period)),
             b'' if self.pending_suggestions is None or self.pending_suggestions is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.pending_suggestions)),b''.join(self.serialize_bytes(x) for x in self.pending_suggestions))),
             b'' if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else (self.groupcall_default_join_as._bytes()),
+            b'' if self.theme_emoticon is None or self.theme_emoticon is False else (self.serialize_bytes(self.theme_emoticon)),
         ))
 
     @classmethod
@@ -2638,7 +2637,7 @@ class ChannelFull(TLObject):
         _has_scheduled = bool(flags & 524288)
         _can_view_stats = bool(flags & 1048576)
         _blocked = bool(flags & 4194304)
-        _id = reader.read_int()
+        _id = reader.read_long()
         _about = reader.tgread_string()
         if flags & 1:
             _participants_count = reader.read_int()
@@ -2676,7 +2675,7 @@ class ChannelFull(TLObject):
             _bot_info.append(_x)
 
         if flags & 16:
-            _migrated_from_chat_id = reader.read_int()
+            _migrated_from_chat_id = reader.read_long()
         else:
             _migrated_from_chat_id = None
         if flags & 16:
@@ -2700,7 +2699,7 @@ class ChannelFull(TLObject):
         else:
             _folder_id = None
         if flags & 16384:
-            _linked_chat_id = reader.read_int()
+            _linked_chat_id = reader.read_long()
         else:
             _linked_chat_id = None
         if flags & 32768:
@@ -2741,7 +2740,11 @@ class ChannelFull(TLObject):
             _groupcall_default_join_as = reader.tgread_object()
         else:
             _groupcall_default_join_as = None
-        return cls(id=_id, about=_about, read_inbox_max_id=_read_inbox_max_id, read_outbox_max_id=_read_outbox_max_id, unread_count=_unread_count, chat_photo=_chat_photo, notify_settings=_notify_settings, bot_info=_bot_info, pts=_pts, can_view_participants=_can_view_participants, can_set_username=_can_set_username, can_set_stickers=_can_set_stickers, hidden_prehistory=_hidden_prehistory, can_set_location=_can_set_location, has_scheduled=_has_scheduled, can_view_stats=_can_view_stats, blocked=_blocked, participants_count=_participants_count, admins_count=_admins_count, kicked_count=_kicked_count, banned_count=_banned_count, online_count=_online_count, exported_invite=_exported_invite, migrated_from_chat_id=_migrated_from_chat_id, migrated_from_max_id=_migrated_from_max_id, pinned_msg_id=_pinned_msg_id, stickerset=_stickerset, available_min_id=_available_min_id, folder_id=_folder_id, linked_chat_id=_linked_chat_id, location=_location, slowmode_seconds=_slowmode_seconds, slowmode_next_send_date=_slowmode_next_send_date, stats_dc=_stats_dc, call=_call, ttl_period=_ttl_period, pending_suggestions=_pending_suggestions, groupcall_default_join_as=_groupcall_default_join_as)
+        if flags & 134217728:
+            _theme_emoticon = reader.tgread_string()
+        else:
+            _theme_emoticon = None
+        return cls(id=_id, about=_about, read_inbox_max_id=_read_inbox_max_id, read_outbox_max_id=_read_outbox_max_id, unread_count=_unread_count, chat_photo=_chat_photo, notify_settings=_notify_settings, bot_info=_bot_info, pts=_pts, can_view_participants=_can_view_participants, can_set_username=_can_set_username, can_set_stickers=_can_set_stickers, hidden_prehistory=_hidden_prehistory, can_set_location=_can_set_location, has_scheduled=_has_scheduled, can_view_stats=_can_view_stats, blocked=_blocked, participants_count=_participants_count, admins_count=_admins_count, kicked_count=_kicked_count, banned_count=_banned_count, online_count=_online_count, exported_invite=_exported_invite, migrated_from_chat_id=_migrated_from_chat_id, migrated_from_max_id=_migrated_from_max_id, pinned_msg_id=_pinned_msg_id, stickerset=_stickerset, available_min_id=_available_min_id, folder_id=_folder_id, linked_chat_id=_linked_chat_id, location=_location, slowmode_seconds=_slowmode_seconds, slowmode_next_send_date=_slowmode_next_send_date, stats_dc=_stats_dc, call=_call, ttl_period=_ttl_period, pending_suggestions=_pending_suggestions, groupcall_default_join_as=_groupcall_default_join_as, theme_emoticon=_theme_emoticon)
 
 
 class ChannelLocation(TLObject):
@@ -2854,7 +2857,7 @@ class ChannelMessagesFilterEmpty(TLObject):
 
 
 class ChannelParticipant(TLObject):
-    CONSTRUCTOR_ID = 0x15ebac1d
+    CONSTRUCTOR_ID = 0xc00c07c0
     SUBCLASS_OF_ID = 0xd9c7fc18
 
     def __init__(self, user_id: int, date: Optional[datetime]):
@@ -2873,20 +2876,20 @@ class ChannelParticipant(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x1d\xac\xeb\x15',
-            struct.pack('<I', self.user_id),
+            b'\xc0\x07\x0c\xc0',
+            struct.pack('<q', self.user_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, date=_date)
 
 
 class ChannelParticipantAdmin(TLObject):
-    CONSTRUCTOR_ID = 0xccbebbaf
+    CONSTRUCTOR_ID = 0x34c3bb53
     SUBCLASS_OF_ID = 0xd9c7fc18
 
     def __init__(self, user_id: int, promoted_by: int, date: Optional[datetime], admin_rights: 'TypeChatAdminRights', can_edit: Optional[bool]=None, is_self: Optional[bool]=None, inviter_id: Optional[int]=None, rank: Optional[str]=None):
@@ -2918,11 +2921,11 @@ class ChannelParticipantAdmin(TLObject):
     def _bytes(self):
         assert ((self.is_self or self.is_self is not None) and (self.inviter_id or self.inviter_id is not None)) or ((self.is_self is None or self.is_self is False) and (self.inviter_id is None or self.inviter_id is False)), 'is_self, inviter_id parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xaf\xbb\xbe\xcc',
+            b'S\xbb\xc34',
             struct.pack('<I', (0 if self.can_edit is None or self.can_edit is False else 1) | (0 if self.is_self is None or self.is_self is False else 2) | (0 if self.inviter_id is None or self.inviter_id is False else 2) | (0 if self.rank is None or self.rank is False else 4)),
-            struct.pack('<I', self.user_id),
-            b'' if self.inviter_id is None or self.inviter_id is False else (struct.pack('<i', self.inviter_id)),
-            struct.pack('<i', self.promoted_by),
+            struct.pack('<q', self.user_id),
+            b'' if self.inviter_id is None or self.inviter_id is False else (struct.pack('<q', self.inviter_id)),
+            struct.pack('<q', self.promoted_by),
             self.serialize_datetime(self.date),
             self.admin_rights._bytes(),
             b'' if self.rank is None or self.rank is False else (self.serialize_bytes(self.rank)),
@@ -2934,12 +2937,12 @@ class ChannelParticipantAdmin(TLObject):
 
         _can_edit = bool(flags & 1)
         _is_self = bool(flags & 2)
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         if flags & 2:
-            _inviter_id = reader.read_int()
+            _inviter_id = reader.read_long()
         else:
             _inviter_id = None
-        _promoted_by = reader.read_int()
+        _promoted_by = reader.read_long()
         _date = reader.tgread_date()
         _admin_rights = reader.tgread_object()
         if flags & 4:
@@ -2950,7 +2953,7 @@ class ChannelParticipantAdmin(TLObject):
 
 
 class ChannelParticipantBanned(TLObject):
-    CONSTRUCTOR_ID = 0x50a1dfd6
+    CONSTRUCTOR_ID = 0x6df8014e
     SUBCLASS_OF_ID = 0xd9c7fc18
 
     def __init__(self, peer: 'TypePeer', kicked_by: int, date: Optional[datetime], banned_rights: 'TypeChatBannedRights', left: Optional[bool]=None):
@@ -2975,10 +2978,10 @@ class ChannelParticipantBanned(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xd6\xdf\xa1P',
+            b'N\x01\xf8m',
             struct.pack('<I', (0 if self.left is None or self.left is False else 1)),
             self.peer._bytes(),
-            struct.pack('<i', self.kicked_by),
+            struct.pack('<q', self.kicked_by),
             self.serialize_datetime(self.date),
             self.banned_rights._bytes(),
         ))
@@ -2989,14 +2992,14 @@ class ChannelParticipantBanned(TLObject):
 
         _left = bool(flags & 1)
         _peer = reader.tgread_object()
-        _kicked_by = reader.read_int()
+        _kicked_by = reader.read_long()
         _date = reader.tgread_date()
         _banned_rights = reader.tgread_object()
         return cls(peer=_peer, kicked_by=_kicked_by, date=_date, banned_rights=_banned_rights, left=_left)
 
 
 class ChannelParticipantCreator(TLObject):
-    CONSTRUCTOR_ID = 0x447dca4b
+    CONSTRUCTOR_ID = 0x2fe601d3
     SUBCLASS_OF_ID = 0xd9c7fc18
 
     def __init__(self, user_id: int, admin_rights: 'TypeChatAdminRights', rank: Optional[str]=None):
@@ -3017,9 +3020,9 @@ class ChannelParticipantCreator(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'K\xca}D',
+            b'\xd3\x01\xe6/',
             struct.pack('<I', (0 if self.rank is None or self.rank is False else 1)),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.admin_rights._bytes(),
             b'' if self.rank is None or self.rank is False else (self.serialize_bytes(self.rank)),
         ))
@@ -3028,7 +3031,7 @@ class ChannelParticipantCreator(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _admin_rights = reader.tgread_object()
         if flags & 1:
             _rank = reader.tgread_string()
@@ -3066,7 +3069,7 @@ class ChannelParticipantLeft(TLObject):
 
 
 class ChannelParticipantSelf(TLObject):
-    CONSTRUCTOR_ID = 0xa3289a6d
+    CONSTRUCTOR_ID = 0x28a8bc67
     SUBCLASS_OF_ID = 0xd9c7fc18
 
     def __init__(self, user_id: int, inviter_id: int, date: Optional[datetime]):
@@ -3087,16 +3090,16 @@ class ChannelParticipantSelf(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'm\x9a(\xa3',
-            struct.pack('<I', self.user_id),
-            struct.pack('<i', self.inviter_id),
+            b'g\xbc\xa8(',
+            struct.pack('<q', self.user_id),
+            struct.pack('<q', self.inviter_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
-        _inviter_id = reader.read_int()
+        _user_id = reader.read_long()
+        _inviter_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, inviter_id=_inviter_id, date=_date)
 
@@ -3312,7 +3315,7 @@ class ChannelParticipantsSearch(TLObject):
 
 
 class Chat(TLObject):
-    CONSTRUCTOR_ID = 0x3bda1bde
+    CONSTRUCTOR_ID = 0x41cbf256
     SUBCLASS_OF_ID = 0xc5af5d94
 
     # noinspection PyShadowingBuiltins
@@ -3358,9 +3361,9 @@ class Chat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xde\x1b\xda;',
+            b'V\xf2\xcbA',
             struct.pack('<I', (0 if self.creator is None or self.creator is False else 1) | (0 if self.kicked is None or self.kicked is False else 2) | (0 if self.left is None or self.left is False else 4) | (0 if self.deactivated is None or self.deactivated is False else 32) | (0 if self.call_active is None or self.call_active is False else 8388608) | (0 if self.call_not_empty is None or self.call_not_empty is False else 16777216) | (0 if self.migrated_to is None or self.migrated_to is False else 64) | (0 if self.admin_rights is None or self.admin_rights is False else 16384) | (0 if self.default_banned_rights is None or self.default_banned_rights is False else 262144)),
-            struct.pack('<i', self.id),
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.title),
             self.photo._bytes(),
             struct.pack('<i', self.participants_count),
@@ -3381,7 +3384,7 @@ class Chat(TLObject):
         _deactivated = bool(flags & 32)
         _call_active = bool(flags & 8388608)
         _call_not_empty = bool(flags & 16777216)
-        _id = reader.read_int()
+        _id = reader.read_long()
         _title = reader.tgread_string()
         _photo = reader.tgread_object()
         _participants_count = reader.read_int()
@@ -3463,7 +3466,7 @@ class ChatAdminRights(TLObject):
 
 
 class ChatAdminWithInvites(TLObject):
-    CONSTRUCTOR_ID = 0xdfd2330f
+    CONSTRUCTOR_ID = 0xf2ecef23
     SUBCLASS_OF_ID = 0x5063f398
 
     def __init__(self, admin_id: int, invites_count: int, revoked_invites_count: int):
@@ -3484,15 +3487,15 @@ class ChatAdminWithInvites(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x0f3\xd2\xdf',
-            struct.pack('<i', self.admin_id),
+            b'#\xef\xec\xf2',
+            struct.pack('<q', self.admin_id),
             struct.pack('<i', self.invites_count),
             struct.pack('<i', self.revoked_invites_count),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _admin_id = reader.read_int()
+        _admin_id = reader.read_long()
         _invites_count = reader.read_int()
         _revoked_invites_count = reader.read_int()
         return cls(admin_id=_admin_id, invites_count=_invites_count, revoked_invites_count=_revoked_invites_count)
@@ -3566,7 +3569,7 @@ class ChatBannedRights(TLObject):
 
 
 class ChatEmpty(TLObject):
-    CONSTRUCTOR_ID = 0x9ba2d800
+    CONSTRUCTOR_ID = 0x29562865
     SUBCLASS_OF_ID = 0xc5af5d94
 
     # noinspection PyShadowingBuiltins
@@ -3584,18 +3587,18 @@ class ChatEmpty(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x00\xd8\xa2\x9b',
-            struct.pack('<i', self.id),
+            b'e(V)',
+            struct.pack('<q', self.id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _id = reader.read_int()
+        _id = reader.read_long()
         return cls(id=_id)
 
 
 class ChatForbidden(TLObject):
-    CONSTRUCTOR_ID = 0x7328bdb
+    CONSTRUCTOR_ID = 0x6592a1a7
     SUBCLASS_OF_ID = 0xc5af5d94
 
     # noinspection PyShadowingBuiltins
@@ -3615,24 +3618,24 @@ class ChatForbidden(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xdb\x8b2\x07',
-            struct.pack('<i', self.id),
+            b'\xa7\xa1\x92e',
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.title),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _id = reader.read_int()
+        _id = reader.read_long()
         _title = reader.tgread_string()
         return cls(id=_id, title=_title)
 
 
 class ChatFull(TLObject):
-    CONSTRUCTOR_ID = 0x8a1e2983
+    CONSTRUCTOR_ID = 0x4dbdc099
     SUBCLASS_OF_ID = 0xd49a2697
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, id: int, about: str, participants: 'TypeChatParticipants', notify_settings: 'TypePeerNotifySettings', can_set_username: Optional[bool]=None, has_scheduled: Optional[bool]=None, chat_photo: Optional['TypePhoto']=None, exported_invite: Optional['TypeExportedChatInvite']=None, bot_info: Optional[List['TypeBotInfo']]=None, pinned_msg_id: Optional[int]=None, folder_id: Optional[int]=None, call: Optional['TypeInputGroupCall']=None, ttl_period: Optional[int]=None, groupcall_default_join_as: Optional['TypePeer']=None):
+    def __init__(self, id: int, about: str, participants: 'TypeChatParticipants', notify_settings: 'TypePeerNotifySettings', can_set_username: Optional[bool]=None, has_scheduled: Optional[bool]=None, chat_photo: Optional['TypePhoto']=None, exported_invite: Optional['TypeExportedChatInvite']=None, bot_info: Optional[List['TypeBotInfo']]=None, pinned_msg_id: Optional[int]=None, folder_id: Optional[int]=None, call: Optional['TypeInputGroupCall']=None, ttl_period: Optional[int]=None, groupcall_default_join_as: Optional['TypePeer']=None, theme_emoticon: Optional[str]=None):
         """
         Constructor for ChatFull: Instance of either ChatFull, ChannelFull.
         """
@@ -3650,6 +3653,7 @@ class ChatFull(TLObject):
         self.call = call
         self.ttl_period = ttl_period
         self.groupcall_default_join_as = groupcall_default_join_as
+        self.theme_emoticon = theme_emoticon
 
     def to_dict(self):
         return {
@@ -3667,14 +3671,15 @@ class ChatFull(TLObject):
             'folder_id': self.folder_id,
             'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call,
             'ttl_period': self.ttl_period,
-            'groupcall_default_join_as': self.groupcall_default_join_as.to_dict() if isinstance(self.groupcall_default_join_as, TLObject) else self.groupcall_default_join_as
+            'groupcall_default_join_as': self.groupcall_default_join_as.to_dict() if isinstance(self.groupcall_default_join_as, TLObject) else self.groupcall_default_join_as,
+            'theme_emoticon': self.theme_emoticon
         }
 
     def _bytes(self):
         return b''.join((
-            b'\x83)\x1e\x8a',
-            struct.pack('<I', (0 if self.can_set_username is None or self.can_set_username is False else 128) | (0 if self.has_scheduled is None or self.has_scheduled is False else 256) | (0 if self.chat_photo is None or self.chat_photo is False else 4) | (0 if self.exported_invite is None or self.exported_invite is False else 8192) | (0 if self.bot_info is None or self.bot_info is False else 8) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 64) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.call is None or self.call is False else 4096) | (0 if self.ttl_period is None or self.ttl_period is False else 16384) | (0 if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else 32768)),
-            struct.pack('<i', self.id),
+            b'\x99\xc0\xbdM',
+            struct.pack('<I', (0 if self.can_set_username is None or self.can_set_username is False else 128) | (0 if self.has_scheduled is None or self.has_scheduled is False else 256) | (0 if self.chat_photo is None or self.chat_photo is False else 4) | (0 if self.exported_invite is None or self.exported_invite is False else 8192) | (0 if self.bot_info is None or self.bot_info is False else 8) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 64) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.call is None or self.call is False else 4096) | (0 if self.ttl_period is None or self.ttl_period is False else 16384) | (0 if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else 32768) | (0 if self.theme_emoticon is None or self.theme_emoticon is False else 65536)),
+            struct.pack('<q', self.id),
             self.serialize_bytes(self.about),
             self.participants._bytes(),
             b'' if self.chat_photo is None or self.chat_photo is False else (self.chat_photo._bytes()),
@@ -3686,6 +3691,7 @@ class ChatFull(TLObject):
             b'' if self.call is None or self.call is False else (self.call._bytes()),
             b'' if self.ttl_period is None or self.ttl_period is False else (struct.pack('<i', self.ttl_period)),
             b'' if self.groupcall_default_join_as is None or self.groupcall_default_join_as is False else (self.groupcall_default_join_as._bytes()),
+            b'' if self.theme_emoticon is None or self.theme_emoticon is False else (self.serialize_bytes(self.theme_emoticon)),
         ))
 
     @classmethod
@@ -3694,7 +3700,7 @@ class ChatFull(TLObject):
 
         _can_set_username = bool(flags & 128)
         _has_scheduled = bool(flags & 256)
-        _id = reader.read_int()
+        _id = reader.read_long()
         _about = reader.tgread_string()
         _participants = reader.tgread_object()
         if flags & 4:
@@ -3735,7 +3741,11 @@ class ChatFull(TLObject):
             _groupcall_default_join_as = reader.tgread_object()
         else:
             _groupcall_default_join_as = None
-        return cls(id=_id, about=_about, participants=_participants, notify_settings=_notify_settings, can_set_username=_can_set_username, has_scheduled=_has_scheduled, chat_photo=_chat_photo, exported_invite=_exported_invite, bot_info=_bot_info, pinned_msg_id=_pinned_msg_id, folder_id=_folder_id, call=_call, ttl_period=_ttl_period, groupcall_default_join_as=_groupcall_default_join_as)
+        if flags & 65536:
+            _theme_emoticon = reader.tgread_string()
+        else:
+            _theme_emoticon = None
+        return cls(id=_id, about=_about, participants=_participants, notify_settings=_notify_settings, can_set_username=_can_set_username, has_scheduled=_has_scheduled, chat_photo=_chat_photo, exported_invite=_exported_invite, bot_info=_bot_info, pinned_msg_id=_pinned_msg_id, folder_id=_folder_id, call=_call, ttl_period=_ttl_period, groupcall_default_join_as=_groupcall_default_join_as, theme_emoticon=_theme_emoticon)
 
 
 class ChatInvite(TLObject):
@@ -3830,7 +3840,7 @@ class ChatInviteAlready(TLObject):
 
 
 class ChatInviteExported(TLObject):
-    CONSTRUCTOR_ID = 0x6e24fc9d
+    CONSTRUCTOR_ID = 0xb18105e8
     SUBCLASS_OF_ID = 0xb4748a58
 
     def __init__(self, link: str, admin_id: int, date: Optional[datetime], revoked: Optional[bool]=None, permanent: Optional[bool]=None, start_date: Optional[datetime]=None, expire_date: Optional[datetime]=None, usage_limit: Optional[int]=None, usage: Optional[int]=None):
@@ -3863,10 +3873,10 @@ class ChatInviteExported(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x9d\xfc$n',
+            b'\xe8\x05\x81\xb1',
             struct.pack('<I', (0 if self.revoked is None or self.revoked is False else 1) | (0 if self.permanent is None or self.permanent is False else 32) | (0 if self.start_date is None or self.start_date is False else 16) | (0 if self.expire_date is None or self.expire_date is False else 2) | (0 if self.usage_limit is None or self.usage_limit is False else 4) | (0 if self.usage is None or self.usage is False else 8)),
             self.serialize_bytes(self.link),
-            struct.pack('<i', self.admin_id),
+            struct.pack('<q', self.admin_id),
             self.serialize_datetime(self.date),
             b'' if self.start_date is None or self.start_date is False else (self.serialize_datetime(self.start_date)),
             b'' if self.expire_date is None or self.expire_date is False else (self.serialize_datetime(self.expire_date)),
@@ -3881,7 +3891,7 @@ class ChatInviteExported(TLObject):
         _revoked = bool(flags & 1)
         _permanent = bool(flags & 32)
         _link = reader.tgread_string()
-        _admin_id = reader.read_int()
+        _admin_id = reader.read_long()
         _date = reader.tgread_date()
         if flags & 16:
             _start_date = reader.tgread_date()
@@ -3903,7 +3913,7 @@ class ChatInviteExported(TLObject):
 
 
 class ChatInviteImporter(TLObject):
-    CONSTRUCTOR_ID = 0x1e3e6680
+    CONSTRUCTOR_ID = 0xb5cd5f4
     SUBCLASS_OF_ID = 0x5312542e
 
     def __init__(self, user_id: int, date: Optional[datetime]):
@@ -3922,14 +3932,14 @@ class ChatInviteImporter(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x80f>\x1e',
-            struct.pack('<I', self.user_id),
+            b'\xf4\xd5\\\x0b',
+            struct.pack('<q', self.user_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, date=_date)
 
@@ -3995,7 +4005,7 @@ class ChatOnlines(TLObject):
 
 
 class ChatParticipant(TLObject):
-    CONSTRUCTOR_ID = 0xc8d7493e
+    CONSTRUCTOR_ID = 0xc02d4007
     SUBCLASS_OF_ID = 0x7d7c6f86
 
     def __init__(self, user_id: int, inviter_id: int, date: Optional[datetime]):
@@ -4016,22 +4026,22 @@ class ChatParticipant(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'>I\xd7\xc8',
-            struct.pack('<I', self.user_id),
-            struct.pack('<i', self.inviter_id),
+            b'\x07@-\xc0',
+            struct.pack('<q', self.user_id),
+            struct.pack('<q', self.inviter_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
-        _inviter_id = reader.read_int()
+        _user_id = reader.read_long()
+        _inviter_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, inviter_id=_inviter_id, date=_date)
 
 
 class ChatParticipantAdmin(TLObject):
-    CONSTRUCTOR_ID = 0xe2d6e436
+    CONSTRUCTOR_ID = 0xa0933f5b
     SUBCLASS_OF_ID = 0x7d7c6f86
 
     def __init__(self, user_id: int, inviter_id: int, date: Optional[datetime]):
@@ -4052,22 +4062,22 @@ class ChatParticipantAdmin(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'6\xe4\xd6\xe2',
-            struct.pack('<I', self.user_id),
-            struct.pack('<i', self.inviter_id),
+            b'[?\x93\xa0',
+            struct.pack('<q', self.user_id),
+            struct.pack('<q', self.inviter_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
-        _inviter_id = reader.read_int()
+        _user_id = reader.read_long()
+        _inviter_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, inviter_id=_inviter_id, date=_date)
 
 
 class ChatParticipantCreator(TLObject):
-    CONSTRUCTOR_ID = 0xda13538a
+    CONSTRUCTOR_ID = 0xe46bcee4
     SUBCLASS_OF_ID = 0x7d7c6f86
 
     def __init__(self, user_id: int):
@@ -4084,18 +4094,18 @@ class ChatParticipantCreator(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x8aS\x13\xda',
-            struct.pack('<I', self.user_id),
+            b'\xe4\xcek\xe4',
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(user_id=_user_id)
 
 
 class ChatParticipants(TLObject):
-    CONSTRUCTOR_ID = 0x3f460fed
+    CONSTRUCTOR_ID = 0x3cbc93f8
     SUBCLASS_OF_ID = 0x1fa89571
 
     def __init__(self, chat_id: int, participants: List['TypeChatParticipant'], version: int):
@@ -4116,15 +4126,15 @@ class ChatParticipants(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xed\x0fF?',
-            struct.pack('<i', self.chat_id),
+            b'\xf8\x93\xbc<',
+            struct.pack('<q', self.chat_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.participants)),b''.join(x._bytes() for x in self.participants),
             struct.pack('<i', self.version),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         reader.read_int()
         _participants = []
         for _ in range(reader.read_int()):
@@ -4136,7 +4146,7 @@ class ChatParticipants(TLObject):
 
 
 class ChatParticipantsForbidden(TLObject):
-    CONSTRUCTOR_ID = 0xfc900c2b
+    CONSTRUCTOR_ID = 0x8763d3e1
     SUBCLASS_OF_ID = 0x1fa89571
 
     def __init__(self, chat_id: int, self_participant: Optional['TypeChatParticipant']=None):
@@ -4155,9 +4165,9 @@ class ChatParticipantsForbidden(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'+\x0c\x90\xfc',
+            b'\xe1\xd3c\x87',
             struct.pack('<I', (0 if self.self_participant is None or self.self_participant is False else 1)),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.chat_id),
             b'' if self.self_participant is None or self.self_participant is False else (self.self_participant._bytes()),
         ))
 
@@ -4165,7 +4175,7 @@ class ChatParticipantsForbidden(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         if flags & 1:
             _self_participant = reader.tgread_object()
         else:
@@ -4235,6 +4245,42 @@ class ChatPhotoEmpty(TLObject):
     @classmethod
     def from_reader(cls, reader):
         return cls()
+
+
+class ChatTheme(TLObject):
+    CONSTRUCTOR_ID = 0xed0b5c33
+    SUBCLASS_OF_ID = 0x2ffca7f5
+
+    def __init__(self, emoticon: str, theme: 'TypeTheme', dark_theme: 'TypeTheme'):
+        """
+        Constructor for ChatTheme: Instance of ChatTheme.
+        """
+        self.emoticon = emoticon
+        self.theme = theme
+        self.dark_theme = dark_theme
+
+    def to_dict(self):
+        return {
+            '_': 'ChatTheme',
+            'emoticon': self.emoticon,
+            'theme': self.theme.to_dict() if isinstance(self.theme, TLObject) else self.theme,
+            'dark_theme': self.dark_theme.to_dict() if isinstance(self.dark_theme, TLObject) else self.dark_theme
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'3\\\x0b\xed',
+            self.serialize_bytes(self.emoticon),
+            self.theme._bytes(),
+            self.dark_theme._bytes(),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _emoticon = reader.tgread_string()
+        _theme = reader.tgread_object()
+        _dark_theme = reader.tgread_object()
+        return cls(emoticon=_emoticon, theme=_theme, dark_theme=_dark_theme)
 
 
 class ClientDHInnerData(TLObject):
@@ -4571,7 +4617,7 @@ class Config(TLObject):
 
 
 class Contact(TLObject):
-    CONSTRUCTOR_ID = 0xf911c994
+    CONSTRUCTOR_ID = 0x145ade0b
     SUBCLASS_OF_ID = 0x83dfdfa4
 
     def __init__(self, user_id: int, mutual: bool):
@@ -4590,20 +4636,20 @@ class Contact(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x94\xc9\x11\xf9',
-            struct.pack('<I', self.user_id),
+            b'\x0b\xdeZ\x14',
+            struct.pack('<q', self.user_id),
             b'\xb5ur\x99' if self.mutual else b'7\x97y\xbc',
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _mutual = reader.tgread_bool()
         return cls(user_id=_user_id, mutual=_mutual)
 
 
 class ContactStatus(TLObject):
-    CONSTRUCTOR_ID = 0xd3680c61
+    CONSTRUCTOR_ID = 0x16d9703b
     SUBCLASS_OF_ID = 0x68c0d74c
 
     def __init__(self, user_id: int, status: 'TypeUserStatus'):
@@ -4622,14 +4668,14 @@ class ContactStatus(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'a\x0ch\xd3',
-            struct.pack('<I', self.user_id),
+            b';p\xd9\x16',
+            struct.pack('<q', self.user_id),
             self.status._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _status = reader.tgread_object()
         return cls(user_id=_user_id, status=_status)
 
@@ -5896,7 +5942,7 @@ class EmojiURL(TLObject):
 
 
 class EncryptedChat(TLObject):
-    CONSTRUCTOR_ID = 0xfa56ce36
+    CONSTRUCTOR_ID = 0x61f0d4c7
     SUBCLASS_OF_ID = 0x6d28a37a
 
     # noinspection PyShadowingBuiltins
@@ -5926,12 +5972,12 @@ class EncryptedChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'6\xceV\xfa',
+            b'\xc7\xd4\xf0a',
             struct.pack('<i', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.serialize_bytes(self.g_a_or_b),
             struct.pack('<q', self.key_fingerprint),
         ))
@@ -5941,8 +5987,8 @@ class EncryptedChat(TLObject):
         _id = reader.read_int()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _g_a_or_b = reader.tgread_bytes()
         _key_fingerprint = reader.read_long()
         return cls(id=_id, access_hash=_access_hash, date=_date, admin_id=_admin_id, participant_id=_participant_id, g_a_or_b=_g_a_or_b, key_fingerprint=_key_fingerprint)
@@ -6013,7 +6059,7 @@ class EncryptedChatEmpty(TLObject):
 
 
 class EncryptedChatRequested(TLObject):
-    CONSTRUCTOR_ID = 0x62718a82
+    CONSTRUCTOR_ID = 0x48f1d94c
     SUBCLASS_OF_ID = 0x6d28a37a
 
     # noinspection PyShadowingBuiltins
@@ -6043,14 +6089,14 @@ class EncryptedChatRequested(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x82\x8aqb',
+            b'L\xd9\xf1H',
             struct.pack('<I', (0 if self.folder_id is None or self.folder_id is False else 1)),
             b'' if self.folder_id is None or self.folder_id is False else (struct.pack('<i', self.folder_id)),
             struct.pack('<i', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.serialize_bytes(self.g_a),
         ))
 
@@ -6065,14 +6111,14 @@ class EncryptedChatRequested(TLObject):
         _id = reader.read_int()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _g_a = reader.tgread_bytes()
         return cls(id=_id, access_hash=_access_hash, date=_date, admin_id=_admin_id, participant_id=_participant_id, g_a=_g_a, folder_id=_folder_id)
 
 
 class EncryptedChatWaiting(TLObject):
-    CONSTRUCTOR_ID = 0x3bf703dc
+    CONSTRUCTOR_ID = 0x66b25953
     SUBCLASS_OF_ID = 0x6d28a37a
 
     # noinspection PyShadowingBuiltins
@@ -6098,12 +6144,12 @@ class EncryptedChatWaiting(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xdc\x03\xf7;',
+            b'SY\xb2f',
             struct.pack('<i', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
         ))
 
     @classmethod
@@ -6111,8 +6157,8 @@ class EncryptedChatWaiting(TLObject):
         _id = reader.read_int()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         return cls(id=_id, access_hash=_access_hash, date=_date, admin_id=_admin_id, participant_id=_participant_id)
 
 
@@ -6655,27 +6701,30 @@ class GlobalPrivacySettings(TLObject):
 
 
 class GroupCall(TLObject):
-    CONSTRUCTOR_ID = 0x653dbaad
+    CONSTRUCTOR_ID = 0xd597650c
     SUBCLASS_OF_ID = 0x20b4f320
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, id: int, access_hash: int, participants_count: int, version: int, join_muted: Optional[bool]=None, can_change_join_muted: Optional[bool]=None, join_date_asc: Optional[bool]=None, schedule_start_subscribed: Optional[bool]=None, can_start_video: Optional[bool]=None, title: Optional[str]=None, stream_dc_id: Optional[int]=None, record_start_date: Optional[datetime]=None, schedule_date: Optional[datetime]=None):
+    def __init__(self, id: int, access_hash: int, participants_count: int, unmuted_video_limit: int, version: int, join_muted: Optional[bool]=None, can_change_join_muted: Optional[bool]=None, join_date_asc: Optional[bool]=None, schedule_start_subscribed: Optional[bool]=None, can_start_video: Optional[bool]=None, record_video_active: Optional[bool]=None, title: Optional[str]=None, stream_dc_id: Optional[int]=None, record_start_date: Optional[datetime]=None, schedule_date: Optional[datetime]=None, unmuted_video_count: Optional[int]=None):
         """
         Constructor for GroupCall: Instance of either GroupCallDiscarded, GroupCall.
         """
         self.id = id
         self.access_hash = access_hash
         self.participants_count = participants_count
+        self.unmuted_video_limit = unmuted_video_limit
         self.version = version
         self.join_muted = join_muted
         self.can_change_join_muted = can_change_join_muted
         self.join_date_asc = join_date_asc
         self.schedule_start_subscribed = schedule_start_subscribed
         self.can_start_video = can_start_video
+        self.record_video_active = record_video_active
         self.title = title
         self.stream_dc_id = stream_dc_id
         self.record_start_date = record_start_date
         self.schedule_date = schedule_date
+        self.unmuted_video_count = unmuted_video_count
 
     def to_dict(self):
         return {
@@ -6683,22 +6732,25 @@ class GroupCall(TLObject):
             'id': self.id,
             'access_hash': self.access_hash,
             'participants_count': self.participants_count,
+            'unmuted_video_limit': self.unmuted_video_limit,
             'version': self.version,
             'join_muted': self.join_muted,
             'can_change_join_muted': self.can_change_join_muted,
             'join_date_asc': self.join_date_asc,
             'schedule_start_subscribed': self.schedule_start_subscribed,
             'can_start_video': self.can_start_video,
+            'record_video_active': self.record_video_active,
             'title': self.title,
             'stream_dc_id': self.stream_dc_id,
             'record_start_date': self.record_start_date,
-            'schedule_date': self.schedule_date
+            'schedule_date': self.schedule_date,
+            'unmuted_video_count': self.unmuted_video_count
         }
 
     def _bytes(self):
         return b''.join((
-            b'\xad\xba=e',
-            struct.pack('<I', (0 if self.join_muted is None or self.join_muted is False else 2) | (0 if self.can_change_join_muted is None or self.can_change_join_muted is False else 4) | (0 if self.join_date_asc is None or self.join_date_asc is False else 64) | (0 if self.schedule_start_subscribed is None or self.schedule_start_subscribed is False else 256) | (0 if self.can_start_video is None or self.can_start_video is False else 512) | (0 if self.title is None or self.title is False else 8) | (0 if self.stream_dc_id is None or self.stream_dc_id is False else 16) | (0 if self.record_start_date is None or self.record_start_date is False else 32) | (0 if self.schedule_date is None or self.schedule_date is False else 128)),
+            b'\x0ce\x97\xd5',
+            struct.pack('<I', (0 if self.join_muted is None or self.join_muted is False else 2) | (0 if self.can_change_join_muted is None or self.can_change_join_muted is False else 4) | (0 if self.join_date_asc is None or self.join_date_asc is False else 64) | (0 if self.schedule_start_subscribed is None or self.schedule_start_subscribed is False else 256) | (0 if self.can_start_video is None or self.can_start_video is False else 512) | (0 if self.record_video_active is None or self.record_video_active is False else 2048) | (0 if self.title is None or self.title is False else 8) | (0 if self.stream_dc_id is None or self.stream_dc_id is False else 16) | (0 if self.record_start_date is None or self.record_start_date is False else 32) | (0 if self.schedule_date is None or self.schedule_date is False else 128) | (0 if self.unmuted_video_count is None or self.unmuted_video_count is False else 1024)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             struct.pack('<i', self.participants_count),
@@ -6706,6 +6758,8 @@ class GroupCall(TLObject):
             b'' if self.stream_dc_id is None or self.stream_dc_id is False else (struct.pack('<i', self.stream_dc_id)),
             b'' if self.record_start_date is None or self.record_start_date is False else (self.serialize_datetime(self.record_start_date)),
             b'' if self.schedule_date is None or self.schedule_date is False else (self.serialize_datetime(self.schedule_date)),
+            b'' if self.unmuted_video_count is None or self.unmuted_video_count is False else (struct.pack('<i', self.unmuted_video_count)),
+            struct.pack('<i', self.unmuted_video_limit),
             struct.pack('<i', self.version),
         ))
 
@@ -6718,6 +6772,7 @@ class GroupCall(TLObject):
         _join_date_asc = bool(flags & 64)
         _schedule_start_subscribed = bool(flags & 256)
         _can_start_video = bool(flags & 512)
+        _record_video_active = bool(flags & 2048)
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _participants_count = reader.read_int()
@@ -6737,8 +6792,13 @@ class GroupCall(TLObject):
             _schedule_date = reader.tgread_date()
         else:
             _schedule_date = None
+        if flags & 1024:
+            _unmuted_video_count = reader.read_int()
+        else:
+            _unmuted_video_count = None
+        _unmuted_video_limit = reader.read_int()
         _version = reader.read_int()
-        return cls(id=_id, access_hash=_access_hash, participants_count=_participants_count, version=_version, join_muted=_join_muted, can_change_join_muted=_can_change_join_muted, join_date_asc=_join_date_asc, schedule_start_subscribed=_schedule_start_subscribed, can_start_video=_can_start_video, title=_title, stream_dc_id=_stream_dc_id, record_start_date=_record_start_date, schedule_date=_schedule_date)
+        return cls(id=_id, access_hash=_access_hash, participants_count=_participants_count, unmuted_video_limit=_unmuted_video_limit, version=_version, join_muted=_join_muted, can_change_join_muted=_can_change_join_muted, join_date_asc=_join_date_asc, schedule_start_subscribed=_schedule_start_subscribed, can_start_video=_can_start_video, record_video_active=_record_video_active, title=_title, stream_dc_id=_stream_dc_id, record_start_date=_record_start_date, schedule_date=_schedule_date, unmuted_video_count=_unmuted_video_count)
 
 
 class GroupCallDiscarded(TLObject):
@@ -6891,31 +6951,34 @@ class GroupCallParticipant(TLObject):
 
 
 class GroupCallParticipantVideo(TLObject):
-    CONSTRUCTOR_ID = 0x78e41663
+    CONSTRUCTOR_ID = 0x67753ac8
     SUBCLASS_OF_ID = 0xef46b8db
 
-    def __init__(self, endpoint: str, source_groups: List['TypeGroupCallParticipantVideoSourceGroup'], paused: Optional[bool]=None):
+    def __init__(self, endpoint: str, source_groups: List['TypeGroupCallParticipantVideoSourceGroup'], paused: Optional[bool]=None, audio_source: Optional[int]=None):
         """
         Constructor for GroupCallParticipantVideo: Instance of GroupCallParticipantVideo.
         """
         self.endpoint = endpoint
         self.source_groups = source_groups
         self.paused = paused
+        self.audio_source = audio_source
 
     def to_dict(self):
         return {
             '_': 'GroupCallParticipantVideo',
             'endpoint': self.endpoint,
             'source_groups': [] if self.source_groups is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.source_groups],
-            'paused': self.paused
+            'paused': self.paused,
+            'audio_source': self.audio_source
         }
 
     def _bytes(self):
         return b''.join((
-            b'c\x16\xe4x',
-            struct.pack('<I', (0 if self.paused is None or self.paused is False else 1)),
+            b'\xc8:ug',
+            struct.pack('<I', (0 if self.paused is None or self.paused is False else 1) | (0 if self.audio_source is None or self.audio_source is False else 2)),
             self.serialize_bytes(self.endpoint),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.source_groups)),b''.join(x._bytes() for x in self.source_groups),
+            b'' if self.audio_source is None or self.audio_source is False else (struct.pack('<i', self.audio_source)),
         ))
 
     @classmethod
@@ -6930,7 +6993,11 @@ class GroupCallParticipantVideo(TLObject):
             _x = reader.tgread_object()
             _source_groups.append(_x)
 
-        return cls(endpoint=_endpoint, source_groups=_source_groups, paused=_paused)
+        if flags & 2:
+            _audio_source = reader.read_int()
+        else:
+            _audio_source = None
+        return cls(endpoint=_endpoint, source_groups=_source_groups, paused=_paused, audio_source=_audio_source)
 
 
 class GroupCallParticipantVideoSourceGroup(TLObject):
@@ -6971,7 +7038,7 @@ class GroupCallParticipantVideoSourceGroup(TLObject):
 
 
 class HighScore(TLObject):
-    CONSTRUCTOR_ID = 0x58fffcd0
+    CONSTRUCTOR_ID = 0x73a379eb
     SUBCLASS_OF_ID = 0xd32b1e35
 
     def __init__(self, pos: int, user_id: int, score: int):
@@ -6992,16 +7059,16 @@ class HighScore(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xd0\xfc\xffX',
+            b'\xeby\xa3s',
             struct.pack('<i', self.pos),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             struct.pack('<i', self.score),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _pos = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _score = reader.read_int()
         return cls(pos=_pos, user_id=_user_id, score=_score)
 
@@ -7043,7 +7110,7 @@ class HttpWait(TLObject):
 
 
 class ImportedContact(TLObject):
-    CONSTRUCTOR_ID = 0xd0028438
+    CONSTRUCTOR_ID = 0xc13e3c50
     SUBCLASS_OF_ID = 0xb545bbda
 
     def __init__(self, user_id: int, client_id: int):
@@ -7062,14 +7129,14 @@ class ImportedContact(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'8\x84\x02\xd0',
-            struct.pack('<I', self.user_id),
+            b'P<>\xc1',
+            struct.pack('<q', self.user_id),
             struct.pack('<q', self.client_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _client_id = reader.read_long()
         return cls(user_id=_user_id, client_id=_client_id)
 
@@ -7283,7 +7350,7 @@ class InputBotInlineMessageID(TLObject):
     # noinspection PyShadowingBuiltins
     def __init__(self, dc_id: int, id: int, access_hash: int):
         """
-        Constructor for InputBotInlineMessageID: Instance of InputBotInlineMessageID.
+        Constructor for InputBotInlineMessageID: Instance of either InputBotInlineMessageID, InputBotInlineMessageID64.
         """
         self.dc_id = dc_id
         self.id = id
@@ -7311,6 +7378,47 @@ class InputBotInlineMessageID(TLObject):
         _id = reader.read_long()
         _access_hash = reader.read_long()
         return cls(dc_id=_dc_id, id=_id, access_hash=_access_hash)
+
+
+class InputBotInlineMessageID64(TLObject):
+    CONSTRUCTOR_ID = 0xb6d915d7
+    SUBCLASS_OF_ID = 0x2dcd6300
+
+    # noinspection PyShadowingBuiltins
+    def __init__(self, dc_id: int, owner_id: int, id: int, access_hash: int):
+        """
+        Constructor for InputBotInlineMessageID: Instance of either InputBotInlineMessageID, InputBotInlineMessageID64.
+        """
+        self.dc_id = dc_id
+        self.owner_id = owner_id
+        self.id = id
+        self.access_hash = access_hash
+
+    def to_dict(self):
+        return {
+            '_': 'InputBotInlineMessageID64',
+            'dc_id': self.dc_id,
+            'owner_id': self.owner_id,
+            'id': self.id,
+            'access_hash': self.access_hash
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xd7\x15\xd9\xb6',
+            struct.pack('<i', self.dc_id),
+            struct.pack('<q', self.owner_id),
+            struct.pack('<i', self.id),
+            struct.pack('<q', self.access_hash),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _dc_id = reader.read_int()
+        _owner_id = reader.read_long()
+        _id = reader.read_int()
+        _access_hash = reader.read_long()
+        return cls(dc_id=_dc_id, owner_id=_owner_id, id=_id, access_hash=_access_hash)
 
 
 class InputBotInlineMessageMediaAuto(TLObject):
@@ -7860,7 +7968,7 @@ class InputBotInlineResultPhoto(TLObject):
 
 
 class InputChannel(TLObject):
-    CONSTRUCTOR_ID = 0xafeb712e
+    CONSTRUCTOR_ID = 0xf35aec28
     SUBCLASS_OF_ID = 0x40f202fd
 
     def __init__(self, channel_id: int, access_hash: int):
@@ -7879,14 +7987,14 @@ class InputChannel(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'.q\xeb\xaf',
-            struct.pack('<i', self.channel_id),
+            b'(\xecZ\xf3',
+            struct.pack('<q', self.channel_id),
             struct.pack('<q', self.access_hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _access_hash = reader.read_long()
         return cls(channel_id=_channel_id, access_hash=_access_hash)
 
@@ -7911,7 +8019,7 @@ class InputChannelEmpty(TLObject):
 
 
 class InputChannelFromMessage(TLObject):
-    CONSTRUCTOR_ID = 0x2a286531
+    CONSTRUCTOR_ID = 0x5b934f9d
     SUBCLASS_OF_ID = 0x40f202fd
 
     def __init__(self, peer: 'TypeInputPeer', msg_id: int, channel_id: int):
@@ -7932,17 +8040,17 @@ class InputChannelFromMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'1e(*',
+            b'\x9dO\x93[',
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
         _msg_id = reader.read_int()
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         return cls(peer=_peer, msg_id=_msg_id, channel_id=_channel_id)
 
 
@@ -8787,39 +8895,57 @@ class InputGroupCall(TLObject):
 
 
 class InputGroupCallStream(TLObject):
-    CONSTRUCTOR_ID = 0xbba51639
+    CONSTRUCTOR_ID = 0x598a92a
     SUBCLASS_OF_ID = 0x1523d462
 
-    def __init__(self, call: 'TypeInputGroupCall', time_ms: int, scale: int):
+    def __init__(self, call: 'TypeInputGroupCall', time_ms: int, scale: int, video_channel: Optional[int]=None, video_quality: Optional[int]=None):
         """
         Constructor for InputFileLocation: Instance of either InputFileLocation, InputEncryptedFileLocation, InputDocumentFileLocation, InputSecureFileLocation, InputTakeoutFileLocation, InputPhotoFileLocation, InputPhotoLegacyFileLocation, InputPeerPhotoFileLocation, InputStickerSetThumb, InputGroupCallStream.
         """
         self.call = call
         self.time_ms = time_ms
         self.scale = scale
+        self.video_channel = video_channel
+        self.video_quality = video_quality
 
     def to_dict(self):
         return {
             '_': 'InputGroupCallStream',
             'call': self.call.to_dict() if isinstance(self.call, TLObject) else self.call,
             'time_ms': self.time_ms,
-            'scale': self.scale
+            'scale': self.scale,
+            'video_channel': self.video_channel,
+            'video_quality': self.video_quality
         }
 
     def _bytes(self):
+        assert ((self.video_channel or self.video_channel is not None) and (self.video_quality or self.video_quality is not None)) or ((self.video_channel is None or self.video_channel is False) and (self.video_quality is None or self.video_quality is False)), 'video_channel, video_quality parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'9\x16\xa5\xbb',
+            b'*\xa9\x98\x05',
+            struct.pack('<I', (0 if self.video_channel is None or self.video_channel is False else 1) | (0 if self.video_quality is None or self.video_quality is False else 1)),
             self.call._bytes(),
             struct.pack('<q', self.time_ms),
             struct.pack('<i', self.scale),
+            b'' if self.video_channel is None or self.video_channel is False else (struct.pack('<i', self.video_channel)),
+            b'' if self.video_quality is None or self.video_quality is False else (struct.pack('<i', self.video_quality)),
         ))
 
     @classmethod
     def from_reader(cls, reader):
+        flags = reader.read_int()
+
         _call = reader.tgread_object()
         _time_ms = reader.read_long()
         _scale = reader.read_int()
-        return cls(call=_call, time_ms=_time_ms, scale=_scale)
+        if flags & 1:
+            _video_channel = reader.read_int()
+        else:
+            _video_channel = None
+        if flags & 1:
+            _video_quality = reader.read_int()
+        else:
+            _video_quality = None
+        return cls(call=_call, time_ms=_time_ms, scale=_scale, video_channel=_video_channel, video_quality=_video_quality)
 
 
 class InputKeyboardButtonUrlAuth(TLObject):
@@ -10222,7 +10348,7 @@ class InputPaymentCredentialsSaved(TLObject):
 
 
 class InputPeerChannel(TLObject):
-    CONSTRUCTOR_ID = 0x20adaef8
+    CONSTRUCTOR_ID = 0x27bcbbfc
     SUBCLASS_OF_ID = 0xc91c90b6
 
     def __init__(self, channel_id: int, access_hash: int):
@@ -10241,20 +10367,20 @@ class InputPeerChannel(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xf8\xae\xad ',
-            struct.pack('<i', self.channel_id),
+            b"\xfc\xbb\xbc'",
+            struct.pack('<q', self.channel_id),
             struct.pack('<q', self.access_hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _access_hash = reader.read_long()
         return cls(channel_id=_channel_id, access_hash=_access_hash)
 
 
 class InputPeerChannelFromMessage(TLObject):
-    CONSTRUCTOR_ID = 0x9c95f7bb
+    CONSTRUCTOR_ID = 0xbd2a0840
     SUBCLASS_OF_ID = 0xc91c90b6
 
     def __init__(self, peer: 'TypeInputPeer', msg_id: int, channel_id: int):
@@ -10275,22 +10401,22 @@ class InputPeerChannelFromMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xbb\xf7\x95\x9c',
+            b'@\x08*\xbd',
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
         _msg_id = reader.read_int()
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         return cls(peer=_peer, msg_id=_msg_id, channel_id=_channel_id)
 
 
 class InputPeerChat(TLObject):
-    CONSTRUCTOR_ID = 0x179be863
+    CONSTRUCTOR_ID = 0x35a95cb9
     SUBCLASS_OF_ID = 0xc91c90b6
 
     def __init__(self, chat_id: int):
@@ -10307,13 +10433,13 @@ class InputPeerChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'c\xe8\x9b\x17',
-            struct.pack('<i', self.chat_id),
+            b'\xb9\\\xa95',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
@@ -10449,7 +10575,7 @@ class InputPeerSelf(TLObject):
 
 
 class InputPeerUser(TLObject):
-    CONSTRUCTOR_ID = 0x7b8e7de6
+    CONSTRUCTOR_ID = 0xdde8a54c
     SUBCLASS_OF_ID = 0xc91c90b6
 
     def __init__(self, user_id: int, access_hash: int):
@@ -10468,20 +10594,20 @@ class InputPeerUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xe6}\x8e{',
-            struct.pack('<I', self.user_id),
+            b'L\xa5\xe8\xdd',
+            struct.pack('<q', self.user_id),
             struct.pack('<q', self.access_hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _access_hash = reader.read_long()
         return cls(user_id=_user_id, access_hash=_access_hash)
 
 
 class InputPeerUserFromMessage(TLObject):
-    CONSTRUCTOR_ID = 0x17bae2e6
+    CONSTRUCTOR_ID = 0xa87b0a1c
     SUBCLASS_OF_ID = 0xc91c90b6
 
     def __init__(self, peer: 'TypeInputPeer', msg_id: int, user_id: int):
@@ -10502,17 +10628,17 @@ class InputPeerUserFromMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xe6\xe2\xba\x17',
+            b'\x1c\n{\xa8',
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
         _msg_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(peer=_peer, msg_id=_msg_id, user_id=_user_id)
 
 
@@ -10907,7 +11033,7 @@ class InputPrivacyValueAllowAll(TLObject):
 
 
 class InputPrivacyValueAllowChatParticipants(TLObject):
-    CONSTRUCTOR_ID = 0x4c81c1ba
+    CONSTRUCTOR_ID = 0x840649cf
     SUBCLASS_OF_ID = 0x5a3b6b22
 
     def __init__(self, chats: List[int]):
@@ -10924,8 +11050,8 @@ class InputPrivacyValueAllowChatParticipants(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xba\xc1\x81L',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<i', x) for x in self.chats),
+            b'\xcfI\x06\x84',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<q', x) for x in self.chats),
         ))
 
     @classmethod
@@ -10933,7 +11059,7 @@ class InputPrivacyValueAllowChatParticipants(TLObject):
         reader.read_int()
         _chats = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _chats.append(_x)
 
         return cls(chats=_chats)
@@ -11011,7 +11137,7 @@ class InputPrivacyValueDisallowAll(TLObject):
 
 
 class InputPrivacyValueDisallowChatParticipants(TLObject):
-    CONSTRUCTOR_ID = 0xd82363af
+    CONSTRUCTOR_ID = 0xe94f0f86
     SUBCLASS_OF_ID = 0x5a3b6b22
 
     def __init__(self, chats: List[int]):
@@ -11028,8 +11154,8 @@ class InputPrivacyValueDisallowChatParticipants(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xafc#\xd8',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<i', x) for x in self.chats),
+            b'\x86\x0fO\xe9',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<q', x) for x in self.chats),
         ))
 
     @classmethod
@@ -11037,7 +11163,7 @@ class InputPrivacyValueDisallowChatParticipants(TLObject):
         reader.read_int()
         _chats = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _chats.append(_x)
 
         return cls(chats=_chats)
@@ -11519,13 +11645,32 @@ class InputStickerSetAnimatedEmoji(TLObject):
         return cls()
 
 
+class InputStickerSetAnimatedEmojiAnimations(TLObject):
+    CONSTRUCTOR_ID = 0xcde3739
+    SUBCLASS_OF_ID = 0x3da389aa
+
+    def to_dict(self):
+        return {
+            '_': 'InputStickerSetAnimatedEmojiAnimations'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'97\xde\x0c',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
 class InputStickerSetDice(TLObject):
     CONSTRUCTOR_ID = 0xe67f520e
     SUBCLASS_OF_ID = 0x3da389aa
 
     def __init__(self, emoticon: str):
         """
-        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice.
+        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice, InputStickerSetAnimatedEmojiAnimations.
         """
         self.emoticon = emoticon
 
@@ -11573,7 +11718,7 @@ class InputStickerSetID(TLObject):
     # noinspection PyShadowingBuiltins
     def __init__(self, id: int, access_hash: int):
         """
-        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice.
+        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice, InputStickerSetAnimatedEmojiAnimations.
         """
         self.id = id
         self.access_hash = access_hash
@@ -11647,7 +11792,7 @@ class InputStickerSetShortName(TLObject):
 
     def __init__(self, short_name: str):
         """
-        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice.
+        Constructor for InputStickerSet: Instance of either InputStickerSetEmpty, InputStickerSetID, InputStickerSetShortName, InputStickerSetAnimatedEmoji, InputStickerSetDice, InputStickerSetAnimatedEmojiAnimations.
         """
         self.short_name = short_name
 
@@ -11812,17 +11957,18 @@ class InputTheme(TLObject):
 
 
 class InputThemeSettings(TLObject):
-    CONSTRUCTOR_ID = 0xbd507cd1
+    CONSTRUCTOR_ID = 0x8fde504f
     SUBCLASS_OF_ID = 0x8338c882
 
-    def __init__(self, base_theme: 'TypeBaseTheme', accent_color: int, message_top_color: Optional[int]=None, message_bottom_color: Optional[int]=None, wallpaper: Optional['TypeInputWallPaper']=None, wallpaper_settings: Optional['TypeWallPaperSettings']=None):
+    def __init__(self, base_theme: 'TypeBaseTheme', accent_color: int, message_colors_animated: Optional[bool]=None, outbox_accent_color: Optional[int]=None, message_colors: Optional[List[int]]=None, wallpaper: Optional['TypeInputWallPaper']=None, wallpaper_settings: Optional['TypeWallPaperSettings']=None):
         """
         Constructor for InputThemeSettings: Instance of InputThemeSettings.
         """
         self.base_theme = base_theme
         self.accent_color = accent_color
-        self.message_top_color = message_top_color
-        self.message_bottom_color = message_bottom_color
+        self.message_colors_animated = message_colors_animated
+        self.outbox_accent_color = outbox_accent_color
+        self.message_colors = message_colors
         self.wallpaper = wallpaper
         self.wallpaper_settings = wallpaper_settings
 
@@ -11831,22 +11977,22 @@ class InputThemeSettings(TLObject):
             '_': 'InputThemeSettings',
             'base_theme': self.base_theme.to_dict() if isinstance(self.base_theme, TLObject) else self.base_theme,
             'accent_color': self.accent_color,
-            'message_top_color': self.message_top_color,
-            'message_bottom_color': self.message_bottom_color,
+            'message_colors_animated': self.message_colors_animated,
+            'outbox_accent_color': self.outbox_accent_color,
+            'message_colors': [] if self.message_colors is None else self.message_colors[:],
             'wallpaper': self.wallpaper.to_dict() if isinstance(self.wallpaper, TLObject) else self.wallpaper,
             'wallpaper_settings': self.wallpaper_settings.to_dict() if isinstance(self.wallpaper_settings, TLObject) else self.wallpaper_settings
         }
 
     def _bytes(self):
-        assert ((self.message_top_color or self.message_top_color is not None) and (self.message_bottom_color or self.message_bottom_color is not None)) or ((self.message_top_color is None or self.message_top_color is False) and (self.message_bottom_color is None or self.message_bottom_color is False)), 'message_top_color, message_bottom_color parameters must all be False-y (like None) or all me True-y'
         assert ((self.wallpaper or self.wallpaper is not None) and (self.wallpaper_settings or self.wallpaper_settings is not None)) or ((self.wallpaper is None or self.wallpaper is False) and (self.wallpaper_settings is None or self.wallpaper_settings is False)), 'wallpaper, wallpaper_settings parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xd1|P\xbd',
-            struct.pack('<I', (0 if self.message_top_color is None or self.message_top_color is False else 1) | (0 if self.message_bottom_color is None or self.message_bottom_color is False else 1) | (0 if self.wallpaper is None or self.wallpaper is False else 2) | (0 if self.wallpaper_settings is None or self.wallpaper_settings is False else 2)),
+            b'OP\xde\x8f',
+            struct.pack('<I', (0 if self.message_colors_animated is None or self.message_colors_animated is False else 4) | (0 if self.outbox_accent_color is None or self.outbox_accent_color is False else 8) | (0 if self.message_colors is None or self.message_colors is False else 1) | (0 if self.wallpaper is None or self.wallpaper is False else 2) | (0 if self.wallpaper_settings is None or self.wallpaper_settings is False else 2)),
             self.base_theme._bytes(),
             struct.pack('<i', self.accent_color),
-            b'' if self.message_top_color is None or self.message_top_color is False else (struct.pack('<i', self.message_top_color)),
-            b'' if self.message_bottom_color is None or self.message_bottom_color is False else (struct.pack('<i', self.message_bottom_color)),
+            b'' if self.outbox_accent_color is None or self.outbox_accent_color is False else (struct.pack('<i', self.outbox_accent_color)),
+            b'' if self.message_colors is None or self.message_colors is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.message_colors)),b''.join(struct.pack('<i', x) for x in self.message_colors))),
             b'' if self.wallpaper is None or self.wallpaper is False else (self.wallpaper._bytes()),
             b'' if self.wallpaper_settings is None or self.wallpaper_settings is False else (self.wallpaper_settings._bytes()),
         ))
@@ -11855,16 +12001,22 @@ class InputThemeSettings(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
+        _message_colors_animated = bool(flags & 4)
         _base_theme = reader.tgread_object()
         _accent_color = reader.read_int()
-        if flags & 1:
-            _message_top_color = reader.read_int()
+        if flags & 8:
+            _outbox_accent_color = reader.read_int()
         else:
-            _message_top_color = None
+            _outbox_accent_color = None
         if flags & 1:
-            _message_bottom_color = reader.read_int()
+            reader.read_int()
+            _message_colors = []
+            for _ in range(reader.read_int()):
+                _x = reader.read_int()
+                _message_colors.append(_x)
+
         else:
-            _message_bottom_color = None
+            _message_colors = None
         if flags & 2:
             _wallpaper = reader.tgread_object()
         else:
@@ -11873,7 +12025,7 @@ class InputThemeSettings(TLObject):
             _wallpaper_settings = reader.tgread_object()
         else:
             _wallpaper_settings = None
-        return cls(base_theme=_base_theme, accent_color=_accent_color, message_top_color=_message_top_color, message_bottom_color=_message_bottom_color, wallpaper=_wallpaper, wallpaper_settings=_wallpaper_settings)
+        return cls(base_theme=_base_theme, accent_color=_accent_color, message_colors_animated=_message_colors_animated, outbox_accent_color=_outbox_accent_color, message_colors=_message_colors, wallpaper=_wallpaper, wallpaper_settings=_wallpaper_settings)
 
 
 class InputThemeSlug(TLObject):
@@ -11905,7 +12057,7 @@ class InputThemeSlug(TLObject):
 
 
 class InputUser(TLObject):
-    CONSTRUCTOR_ID = 0xd8292816
+    CONSTRUCTOR_ID = 0xf21158c6
     SUBCLASS_OF_ID = 0xe669bf46
 
     def __init__(self, user_id: int, access_hash: int):
@@ -11924,14 +12076,14 @@ class InputUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x16()\xd8',
-            struct.pack('<I', self.user_id),
+            b'\xc6X\x11\xf2',
+            struct.pack('<q', self.user_id),
             struct.pack('<q', self.access_hash),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _access_hash = reader.read_long()
         return cls(user_id=_user_id, access_hash=_access_hash)
 
@@ -11956,7 +12108,7 @@ class InputUserEmpty(TLObject):
 
 
 class InputUserFromMessage(TLObject):
-    CONSTRUCTOR_ID = 0x2d117597
+    CONSTRUCTOR_ID = 0x1da448e2
     SUBCLASS_OF_ID = 0xe669bf46
 
     def __init__(self, peer: 'TypeInputPeer', msg_id: int, user_id: int):
@@ -11977,17 +12129,17 @@ class InputUserFromMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x97u\x11-',
+            b'\xe2H\xa4\x1d',
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _peer = reader.tgread_object()
         _msg_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(peer=_peer, msg_id=_msg_id, user_id=_user_id)
 
 
@@ -13262,7 +13414,7 @@ class MaskCoords(TLObject):
 
 
 class Message(TLObject):
-    CONSTRUCTOR_ID = 0xbce383d2
+    CONSTRUCTOR_ID = 0x85d6cbe2
     SUBCLASS_OF_ID = 0x790009e3
 
     # noinspection PyShadowingBuiltins
@@ -13335,13 +13487,13 @@ class Message(TLObject):
     def _bytes(self):
         assert ((self.views or self.views is not None) and (self.forwards or self.forwards is not None)) or ((self.views is None or self.views is False) and (self.forwards is None or self.forwards is False)), 'views, forwards parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xd2\x83\xe3\xbc',
+            b'\xe2\xcb\xd6\x85',
             struct.pack('<I', (0 if self.out is None or self.out is False else 2) | (0 if self.mentioned is None or self.mentioned is False else 16) | (0 if self.media_unread is None or self.media_unread is False else 32) | (0 if self.silent is None or self.silent is False else 8192) | (0 if self.post is None or self.post is False else 16384) | (0 if self.from_scheduled is None or self.from_scheduled is False else 262144) | (0 if self.legacy is None or self.legacy is False else 524288) | (0 if self.edit_hide is None or self.edit_hide is False else 2097152) | (0 if self.pinned is None or self.pinned is False else 16777216) | (0 if self.from_id is None or self.from_id is False else 256) | (0 if self.fwd_from is None or self.fwd_from is False else 4) | (0 if self.via_bot_id is None or self.via_bot_id is False else 2048) | (0 if self.reply_to is None or self.reply_to is False else 8) | (0 if self.media is None or self.media is False else 512) | (0 if self.reply_markup is None or self.reply_markup is False else 64) | (0 if self.entities is None or self.entities is False else 128) | (0 if self.views is None or self.views is False else 1024) | (0 if self.forwards is None or self.forwards is False else 1024) | (0 if self.replies is None or self.replies is False else 8388608) | (0 if self.edit_date is None or self.edit_date is False else 32768) | (0 if self.post_author is None or self.post_author is False else 65536) | (0 if self.grouped_id is None or self.grouped_id is False else 131072) | (0 if self.restriction_reason is None or self.restriction_reason is False else 4194304) | (0 if self.ttl_period is None or self.ttl_period is False else 33554432)),
             struct.pack('<i', self.id),
             b'' if self.from_id is None or self.from_id is False else (self.from_id._bytes()),
             self.peer_id._bytes(),
             b'' if self.fwd_from is None or self.fwd_from is False else (self.fwd_from._bytes()),
-            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<i', self.via_bot_id)),
+            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<q', self.via_bot_id)),
             b'' if self.reply_to is None or self.reply_to is False else (self.reply_to._bytes()),
             self.serialize_datetime(self.date),
             self.serialize_bytes(self.message),
@@ -13382,7 +13534,7 @@ class Message(TLObject):
         else:
             _fwd_from = None
         if flags & 2048:
-            _via_bot_id = reader.read_int()
+            _via_bot_id = reader.read_long()
         else:
             _via_bot_id = None
         if flags & 8:
@@ -13454,7 +13606,7 @@ class MessageActionBotAllowed(TLObject):
 
     def __init__(self, domain: str):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.domain = domain
 
@@ -13482,7 +13634,7 @@ class MessageActionChannelCreate(TLObject):
 
     def __init__(self, title: str):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.title = title
 
@@ -13505,12 +13657,12 @@ class MessageActionChannelCreate(TLObject):
 
 
 class MessageActionChannelMigrateFrom(TLObject):
-    CONSTRUCTOR_ID = 0xb055eaee
+    CONSTRUCTOR_ID = 0xea3948e9
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, title: str, chat_id: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.title = title
         self.chat_id = chat_id
@@ -13524,25 +13676,25 @@ class MessageActionChannelMigrateFrom(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xee\xeaU\xb0',
+            b'\xe9H9\xea',
             self.serialize_bytes(self.title),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _title = reader.tgread_string()
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(title=_title, chat_id=_chat_id)
 
 
 class MessageActionChatAddUser(TLObject):
-    CONSTRUCTOR_ID = 0x488a7337
+    CONSTRUCTOR_ID = 0x15cefd00
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, users: List[int]):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.users = users
 
@@ -13554,8 +13706,8 @@ class MessageActionChatAddUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'7s\x8aH',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<i', x) for x in self.users),
+            b'\x00\xfd\xce\x15',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<q', x) for x in self.users),
         ))
 
     @classmethod
@@ -13563,19 +13715,19 @@ class MessageActionChatAddUser(TLObject):
         reader.read_int()
         _users = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _users.append(_x)
 
         return cls(users=_users)
 
 
 class MessageActionChatCreate(TLObject):
-    CONSTRUCTOR_ID = 0xa6638b9a
+    CONSTRUCTOR_ID = 0xbd47cbad
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, title: str, users: List[int]):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.title = title
         self.users = users
@@ -13589,9 +13741,9 @@ class MessageActionChatCreate(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x9a\x8bc\xa6',
+            b'\xad\xcbG\xbd',
             self.serialize_bytes(self.title),
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<i', x) for x in self.users),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<q', x) for x in self.users),
         ))
 
     @classmethod
@@ -13600,7 +13752,7 @@ class MessageActionChatCreate(TLObject):
         reader.read_int()
         _users = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _users.append(_x)
 
         return cls(title=_title, users=_users)
@@ -13626,12 +13778,12 @@ class MessageActionChatDeletePhoto(TLObject):
 
 
 class MessageActionChatDeleteUser(TLObject):
-    CONSTRUCTOR_ID = 0xb2ae9b0c
+    CONSTRUCTOR_ID = 0xa43f30cc
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, user_id: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.user_id = user_id
 
@@ -13643,13 +13795,13 @@ class MessageActionChatDeleteUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x0c\x9b\xae\xb2',
-            struct.pack('<I', self.user_id),
+            b'\xcc0?\xa4',
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(user_id=_user_id)
 
 
@@ -13659,7 +13811,7 @@ class MessageActionChatEditPhoto(TLObject):
 
     def __init__(self, photo: 'TypePhoto'):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.photo = photo
 
@@ -13687,7 +13839,7 @@ class MessageActionChatEditTitle(TLObject):
 
     def __init__(self, title: str):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.title = title
 
@@ -13710,12 +13862,12 @@ class MessageActionChatEditTitle(TLObject):
 
 
 class MessageActionChatJoinedByLink(TLObject):
-    CONSTRUCTOR_ID = 0xf89cf5e8
+    CONSTRUCTOR_ID = 0x31224c3
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, inviter_id: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.inviter_id = inviter_id
 
@@ -13727,23 +13879,23 @@ class MessageActionChatJoinedByLink(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xe8\xf5\x9c\xf8',
-            struct.pack('<i', self.inviter_id),
+            b'\xc3$\x12\x03',
+            struct.pack('<q', self.inviter_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _inviter_id = reader.read_int()
+        _inviter_id = reader.read_long()
         return cls(inviter_id=_inviter_id)
 
 
 class MessageActionChatMigrateTo(TLObject):
-    CONSTRUCTOR_ID = 0x51bdb021
+    CONSTRUCTOR_ID = 0xe1037f92
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, channel_id: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.channel_id = channel_id
 
@@ -13755,13 +13907,13 @@ class MessageActionChatMigrateTo(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'!\xb0\xbdQ',
-            struct.pack('<i', self.channel_id),
+            b'\x92\x7f\x03\xe1',
+            struct.pack('<q', self.channel_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         return cls(channel_id=_channel_id)
 
 
@@ -13790,7 +13942,7 @@ class MessageActionCustomAction(TLObject):
 
     def __init__(self, message: str):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.message = message
 
@@ -13837,7 +13989,7 @@ class MessageActionGameScore(TLObject):
 
     def __init__(self, game_id: int, score: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.game_id = game_id
         self.score = score
@@ -13869,7 +14021,7 @@ class MessageActionGeoProximityReached(TLObject):
 
     def __init__(self, from_id: 'TypePeer', to_id: 'TypePeer', distance: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.from_id = from_id
         self.to_id = to_id
@@ -13905,7 +14057,7 @@ class MessageActionGroupCall(TLObject):
 
     def __init__(self, call: 'TypeInputGroupCall', duration: Optional[int]=None):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.call = call
         self.duration = duration
@@ -13943,7 +14095,7 @@ class MessageActionGroupCallScheduled(TLObject):
 
     def __init__(self, call: 'TypeInputGroupCall', schedule_date: Optional[datetime]):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.call = call
         self.schedule_date = schedule_date
@@ -13989,12 +14141,12 @@ class MessageActionHistoryClear(TLObject):
 
 
 class MessageActionInviteToGroupCall(TLObject):
-    CONSTRUCTOR_ID = 0x76b9f11a
+    CONSTRUCTOR_ID = 0x502f92f7
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, call: 'TypeInputGroupCall', users: List[int]):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.call = call
         self.users = users
@@ -14008,9 +14160,9 @@ class MessageActionInviteToGroupCall(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x1a\xf1\xb9v',
+            b'\xf7\x92/P',
             self.call._bytes(),
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<i', x) for x in self.users),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<q', x) for x in self.users),
         ))
 
     @classmethod
@@ -14019,7 +14171,7 @@ class MessageActionInviteToGroupCall(TLObject):
         reader.read_int()
         _users = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _users.append(_x)
 
         return cls(call=_call, users=_users)
@@ -14031,7 +14183,7 @@ class MessageActionPaymentSent(TLObject):
 
     def __init__(self, currency: str, total_amount: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.currency = currency
         self.total_amount = total_amount
@@ -14063,7 +14215,7 @@ class MessageActionPaymentSentMe(TLObject):
 
     def __init__(self, currency: str, total_amount: int, payload: bytes, charge: 'TypePaymentCharge', info: Optional['TypePaymentRequestedInfo']=None, shipping_option_id: Optional[str]=None):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.currency = currency
         self.total_amount = total_amount
@@ -14120,7 +14272,7 @@ class MessageActionPhoneCall(TLObject):
 
     def __init__(self, call_id: int, video: Optional[bool]=None, reason: Optional['TypePhoneCallDiscardReason']=None, duration: Optional[int]=None):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.call_id = call_id
         self.video = video
@@ -14206,7 +14358,7 @@ class MessageActionSecureValuesSent(TLObject):
 
     def __init__(self, types: List['TypeSecureValueType']):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.types = types
 
@@ -14239,7 +14391,7 @@ class MessageActionSecureValuesSentMe(TLObject):
 
     def __init__(self, values: List['TypeSecureValue'], credentials: 'TypeSecureCredentialsEncrypted'):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.values = values
         self.credentials = credentials
@@ -14270,13 +14422,41 @@ class MessageActionSecureValuesSentMe(TLObject):
         return cls(values=_values, credentials=_credentials)
 
 
+class MessageActionSetChatTheme(TLObject):
+    CONSTRUCTOR_ID = 0xaa786345
+    SUBCLASS_OF_ID = 0x8680d126
+
+    def __init__(self, emoticon: str):
+        """
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
+        """
+        self.emoticon = emoticon
+
+    def to_dict(self):
+        return {
+            '_': 'MessageActionSetChatTheme',
+            'emoticon': self.emoticon
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'Ecx\xaa',
+            self.serialize_bytes(self.emoticon),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _emoticon = reader.tgread_string()
+        return cls(emoticon=_emoticon)
+
+
 class MessageActionSetMessagesTTL(TLObject):
     CONSTRUCTOR_ID = 0xaa1afbfd
     SUBCLASS_OF_ID = 0x8680d126
 
     def __init__(self, period: int):
         """
-        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled.
+        Constructor for MessageAction: Instance of either MessageActionEmpty, MessageActionChatCreate, MessageActionChatEditTitle, MessageActionChatEditPhoto, MessageActionChatDeletePhoto, MessageActionChatAddUser, MessageActionChatDeleteUser, MessageActionChatJoinedByLink, MessageActionChannelCreate, MessageActionChatMigrateTo, MessageActionChannelMigrateFrom, MessageActionPinMessage, MessageActionHistoryClear, MessageActionGameScore, MessageActionPaymentSentMe, MessageActionPaymentSent, MessageActionPhoneCall, MessageActionScreenshotTaken, MessageActionCustomAction, MessageActionBotAllowed, MessageActionSecureValuesSentMe, MessageActionSecureValuesSent, MessageActionContactSignUp, MessageActionGeoProximityReached, MessageActionGroupCall, MessageActionInviteToGroupCall, MessageActionSetMessagesTTL, MessageActionGroupCallScheduled, MessageActionSetChatTheme.
         """
         self.period = period
 
@@ -14658,7 +14838,7 @@ class MessageEntityMention(TLObject):
 
 
 class MessageEntityMentionName(TLObject):
-    CONSTRUCTOR_ID = 0x352dca58
+    CONSTRUCTOR_ID = 0xdc7b1140
     SUBCLASS_OF_ID = 0xcf6419dc
 
     def __init__(self, offset: int, length: int, user_id: int):
@@ -14679,17 +14859,17 @@ class MessageEntityMentionName(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'X\xca-5',
+            b'@\x11{\xdc',
             struct.pack('<i', self.offset),
             struct.pack('<i', self.length),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _offset = reader.read_int()
         _length = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(offset=_offset, length=_length, user_id=_user_id)
 
 
@@ -15046,7 +15226,7 @@ class MessageInteractionCounters(TLObject):
 
 
 class MessageMediaContact(TLObject):
-    CONSTRUCTOR_ID = 0xcbf24940
+    CONSTRUCTOR_ID = 0x70322949
     SUBCLASS_OF_ID = 0x476cbe32
 
     def __init__(self, phone_number: str, first_name: str, last_name: str, vcard: str, user_id: int):
@@ -15071,12 +15251,12 @@ class MessageMediaContact(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'@I\xf2\xcb',
+            b'I)2p',
             self.serialize_bytes(self.phone_number),
             self.serialize_bytes(self.first_name),
             self.serialize_bytes(self.last_name),
             self.serialize_bytes(self.vcard),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
@@ -15085,7 +15265,7 @@ class MessageMediaContact(TLObject):
         _first_name = reader.tgread_string()
         _last_name = reader.tgread_string()
         _vcard = reader.tgread_string()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(phone_number=_phone_number, first_name=_first_name, last_name=_last_name, vcard=_vcard, user_id=_user_id)
 
 
@@ -15554,7 +15734,7 @@ class MessageRange(TLObject):
 
 
 class MessageReplies(TLObject):
-    CONSTRUCTOR_ID = 0x4128faac
+    CONSTRUCTOR_ID = 0x83d60fc2
     SUBCLASS_OF_ID = 0x6ccd5ce2
 
     def __init__(self, replies: int, replies_pts: int, comments: Optional[bool]=None, recent_repliers: Optional[List['TypePeer']]=None, channel_id: Optional[int]=None, max_id: Optional[int]=None, read_max_id: Optional[int]=None):
@@ -15584,12 +15764,12 @@ class MessageReplies(TLObject):
     def _bytes(self):
         assert ((self.comments or self.comments is not None) and (self.channel_id or self.channel_id is not None)) or ((self.comments is None or self.comments is False) and (self.channel_id is None or self.channel_id is False)), 'comments, channel_id parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xac\xfa(A',
+            b'\xc2\x0f\xd6\x83',
             struct.pack('<I', (0 if self.comments is None or self.comments is False else 1) | (0 if self.recent_repliers is None or self.recent_repliers is False else 2) | (0 if self.channel_id is None or self.channel_id is False else 1) | (0 if self.max_id is None or self.max_id is False else 4) | (0 if self.read_max_id is None or self.read_max_id is False else 8)),
             struct.pack('<i', self.replies),
             struct.pack('<i', self.replies_pts),
             b'' if self.recent_repliers is None or self.recent_repliers is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.recent_repliers)),b''.join(x._bytes() for x in self.recent_repliers))),
-            b'' if self.channel_id is None or self.channel_id is False else (struct.pack('<i', self.channel_id)),
+            b'' if self.channel_id is None or self.channel_id is False else (struct.pack('<q', self.channel_id)),
             b'' if self.max_id is None or self.max_id is False else (struct.pack('<i', self.max_id)),
             b'' if self.read_max_id is None or self.read_max_id is False else (struct.pack('<i', self.read_max_id)),
         ))
@@ -15611,7 +15791,7 @@ class MessageReplies(TLObject):
         else:
             _recent_repliers = None
         if flags & 1:
-            _channel_id = reader.read_int()
+            _channel_id = reader.read_long()
         else:
             _channel_id = None
         if flags & 4:
@@ -15754,7 +15934,7 @@ class MessageService(TLObject):
 
 
 class MessageUserVote(TLObject):
-    CONSTRUCTOR_ID = 0xa28e5559
+    CONSTRUCTOR_ID = 0x34d247b4
     SUBCLASS_OF_ID = 0xc92cd592
 
     def __init__(self, user_id: int, option: bytes, date: Optional[datetime]):
@@ -15775,22 +15955,22 @@ class MessageUserVote(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'YU\x8e\xa2',
-            struct.pack('<I', self.user_id),
+            b'\xb4G\xd24',
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.option),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _option = reader.tgread_bytes()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, option=_option, date=_date)
 
 
 class MessageUserVoteInputOption(TLObject):
-    CONSTRUCTOR_ID = 0x36377430
+    CONSTRUCTOR_ID = 0x3ca5b0ec
     SUBCLASS_OF_ID = 0xc92cd592
 
     def __init__(self, user_id: int, date: Optional[datetime]):
@@ -15809,20 +15989,20 @@ class MessageUserVoteInputOption(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'0t76',
-            struct.pack('<I', self.user_id),
+            b'\xec\xb0\xa5<',
+            struct.pack('<q', self.user_id),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _date = reader.tgread_date()
         return cls(user_id=_user_id, date=_date)
 
 
 class MessageUserVoteMultiple(TLObject):
-    CONSTRUCTOR_ID = 0xe8fe0de
+    CONSTRUCTOR_ID = 0x8a65e557
     SUBCLASS_OF_ID = 0xc92cd592
 
     def __init__(self, user_id: int, options: List[bytes], date: Optional[datetime]):
@@ -15843,15 +16023,15 @@ class MessageUserVoteMultiple(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xde\xe0\x8f\x0e',
-            struct.pack('<I', self.user_id),
+            b'W\xe5e\x8a',
+            struct.pack('<q', self.user_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.options)),b''.join(self.serialize_bytes(x) for x in self.options),
             self.serialize_datetime(self.date),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         reader.read_int()
         _options = []
         for _ in range(reader.read_int()):
@@ -18146,7 +18326,7 @@ class PeerBlocked(TLObject):
 
 
 class PeerChannel(TLObject):
-    CONSTRUCTOR_ID = 0xbddde532
+    CONSTRUCTOR_ID = 0xa2a5371e
     SUBCLASS_OF_ID = 0x2d45687
 
     def __init__(self, channel_id: int):
@@ -18163,18 +18343,18 @@ class PeerChannel(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'2\xe5\xdd\xbd',
-            struct.pack('<i', self.channel_id),
+            b'\x1e7\xa5\xa2',
+            struct.pack('<q', self.channel_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         return cls(channel_id=_channel_id)
 
 
 class PeerChat(TLObject):
-    CONSTRUCTOR_ID = 0xbad0e5bb
+    CONSTRUCTOR_ID = 0x36c6019a
     SUBCLASS_OF_ID = 0x2d45687
 
     def __init__(self, chat_id: int):
@@ -18191,13 +18371,13 @@ class PeerChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xbb\xe5\xd0\xba',
-            struct.pack('<i', self.chat_id),
+            b'\x9a\x01\xc66',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
@@ -18379,7 +18559,7 @@ class PeerSettings(TLObject):
 
 
 class PeerUser(TLObject):
-    CONSTRUCTOR_ID = 0x9db1bc6d
+    CONSTRUCTOR_ID = 0x59511722
     SUBCLASS_OF_ID = 0x2d45687
 
     def __init__(self, user_id: int):
@@ -18396,18 +18576,18 @@ class PeerUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'm\xbc\xb1\x9d',
-            struct.pack('<I', self.user_id),
+            b'"\x17QY',
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(user_id=_user_id)
 
 
 class PhoneCall(TLObject):
-    CONSTRUCTOR_ID = 0x8742ae7f
+    CONSTRUCTOR_ID = 0x967f7c67
     SUBCLASS_OF_ID = 0xc47f1bd1
 
     # noinspection PyShadowingBuiltins
@@ -18447,13 +18627,13 @@ class PhoneCall(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x7f\xaeB\x87',
+            b'g|\x7f\x96',
             struct.pack('<I', (0 if self.p2p_allowed is None or self.p2p_allowed is False else 32) | (0 if self.video is None or self.video is False else 64)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.serialize_bytes(self.g_a_or_b),
             struct.pack('<q', self.key_fingerprint),
             self.protocol._bytes(),
@@ -18470,8 +18650,8 @@ class PhoneCall(TLObject):
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _g_a_or_b = reader.tgread_bytes()
         _key_fingerprint = reader.read_long()
         _protocol = reader.tgread_object()
@@ -18486,7 +18666,7 @@ class PhoneCall(TLObject):
 
 
 class PhoneCallAccepted(TLObject):
-    CONSTRUCTOR_ID = 0x997c454a
+    CONSTRUCTOR_ID = 0x3660c311
     SUBCLASS_OF_ID = 0xc47f1bd1
 
     # noinspection PyShadowingBuiltins
@@ -18518,13 +18698,13 @@ class PhoneCallAccepted(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'JE|\x99',
+            b'\x11\xc3`6',
             struct.pack('<I', (0 if self.video is None or self.video is False else 64)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.serialize_bytes(self.g_b),
             self.protocol._bytes(),
         ))
@@ -18537,8 +18717,8 @@ class PhoneCallAccepted(TLObject):
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _g_b = reader.tgread_bytes()
         _protocol = reader.tgread_object()
         return cls(id=_id, access_hash=_access_hash, date=_date, admin_id=_admin_id, participant_id=_participant_id, g_b=_g_b, protocol=_protocol, video=_video)
@@ -18755,7 +18935,7 @@ class PhoneCallProtocol(TLObject):
 
 
 class PhoneCallRequested(TLObject):
-    CONSTRUCTOR_ID = 0x87eabb53
+    CONSTRUCTOR_ID = 0x14b0ed0c
     SUBCLASS_OF_ID = 0xc47f1bd1
 
     # noinspection PyShadowingBuiltins
@@ -18787,13 +18967,13 @@ class PhoneCallRequested(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'S\xbb\xea\x87',
+            b'\x0c\xed\xb0\x14',
             struct.pack('<I', (0 if self.video is None or self.video is False else 64)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.serialize_bytes(self.g_a_hash),
             self.protocol._bytes(),
         ))
@@ -18806,15 +18986,15 @@ class PhoneCallRequested(TLObject):
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _g_a_hash = reader.tgread_bytes()
         _protocol = reader.tgread_object()
         return cls(id=_id, access_hash=_access_hash, date=_date, admin_id=_admin_id, participant_id=_participant_id, g_a_hash=_g_a_hash, protocol=_protocol, video=_video)
 
 
 class PhoneCallWaiting(TLObject):
-    CONSTRUCTOR_ID = 0x1b8f4ad1
+    CONSTRUCTOR_ID = 0xc5226f17
     SUBCLASS_OF_ID = 0xc47f1bd1
 
     # noinspection PyShadowingBuiltins
@@ -18846,13 +19026,13 @@ class PhoneCallWaiting(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xd1J\x8f\x1b',
+            b'\x17o"\xc5',
             struct.pack('<I', (0 if self.video is None or self.video is False else 64) | (0 if self.receive_date is None or self.receive_date is False else 1)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.admin_id),
-            struct.pack('<i', self.participant_id),
+            struct.pack('<q', self.admin_id),
+            struct.pack('<q', self.participant_id),
             self.protocol._bytes(),
             b'' if self.receive_date is None or self.receive_date is False else (self.serialize_datetime(self.receive_date)),
         ))
@@ -18865,8 +19045,8 @@ class PhoneCallWaiting(TLObject):
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _date = reader.tgread_date()
-        _admin_id = reader.read_int()
-        _participant_id = reader.read_int()
+        _admin_id = reader.read_long()
+        _participant_id = reader.read_long()
         _protocol = reader.tgread_object()
         if flags & 1:
             _receive_date = reader.tgread_date()
@@ -19447,7 +19627,7 @@ class PollAnswerVoters(TLObject):
 
 
 class PollResults(TLObject):
-    CONSTRUCTOR_ID = 0xbadcc1a3
+    CONSTRUCTOR_ID = 0xdcb82ea3
     SUBCLASS_OF_ID = 0xc3b4f687
 
     # noinspection PyShadowingBuiltins
@@ -19476,11 +19656,11 @@ class PollResults(TLObject):
     def _bytes(self):
         assert ((self.solution or self.solution is not None) and (self.solution_entities or self.solution_entities is not None)) or ((self.solution is None or self.solution is False) and (self.solution_entities is None or self.solution_entities is False)), 'solution, solution_entities parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xa3\xc1\xdc\xba',
+            b'\xa3.\xb8\xdc',
             struct.pack('<I', (0 if self.min is None or self.min is False else 1) | (0 if self.results is None or self.results is False else 2) | (0 if self.total_voters is None or self.total_voters is False else 4) | (0 if self.recent_voters is None or self.recent_voters is False else 8) | (0 if self.solution is None or self.solution is False else 16) | (0 if self.solution_entities is None or self.solution_entities is False else 16)),
             b'' if self.results is None or self.results is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.results)),b''.join(x._bytes() for x in self.results))),
             b'' if self.total_voters is None or self.total_voters is False else (struct.pack('<i', self.total_voters)),
-            b'' if self.recent_voters is None or self.recent_voters is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.recent_voters)),b''.join(struct.pack('<i', x) for x in self.recent_voters))),
+            b'' if self.recent_voters is None or self.recent_voters is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.recent_voters)),b''.join(struct.pack('<q', x) for x in self.recent_voters))),
             b'' if self.solution is None or self.solution is False else (self.serialize_bytes(self.solution)),
             b'' if self.solution_entities is None or self.solution_entities is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.solution_entities)),b''.join(x._bytes() for x in self.solution_entities))),
         ))
@@ -19507,7 +19687,7 @@ class PollResults(TLObject):
             reader.read_int()
             _recent_voters = []
             for _ in range(reader.read_int()):
-                _x = reader.read_int()
+                _x = reader.read_long()
                 _recent_voters.append(_x)
 
         else:
@@ -19812,7 +19992,7 @@ class PrivacyValueAllowAll(TLObject):
 
 
 class PrivacyValueAllowChatParticipants(TLObject):
-    CONSTRUCTOR_ID = 0x18be796b
+    CONSTRUCTOR_ID = 0x6b134e8e
     SUBCLASS_OF_ID = 0xebb7f270
 
     def __init__(self, chats: List[int]):
@@ -19829,8 +20009,8 @@ class PrivacyValueAllowChatParticipants(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'ky\xbe\x18',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<i', x) for x in self.chats),
+            b'\x8eN\x13k',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<q', x) for x in self.chats),
         ))
 
     @classmethod
@@ -19838,7 +20018,7 @@ class PrivacyValueAllowChatParticipants(TLObject):
         reader.read_int()
         _chats = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _chats.append(_x)
 
         return cls(chats=_chats)
@@ -19864,7 +20044,7 @@ class PrivacyValueAllowContacts(TLObject):
 
 
 class PrivacyValueAllowUsers(TLObject):
-    CONSTRUCTOR_ID = 0x4d5bbe0c
+    CONSTRUCTOR_ID = 0xb8905fb2
     SUBCLASS_OF_ID = 0xebb7f270
 
     def __init__(self, users: List[int]):
@@ -19881,8 +20061,8 @@ class PrivacyValueAllowUsers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x0c\xbe[M',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<i', x) for x in self.users),
+            b'\xb2_\x90\xb8',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<q', x) for x in self.users),
         ))
 
     @classmethod
@@ -19890,7 +20070,7 @@ class PrivacyValueAllowUsers(TLObject):
         reader.read_int()
         _users = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _users.append(_x)
 
         return cls(users=_users)
@@ -19916,7 +20096,7 @@ class PrivacyValueDisallowAll(TLObject):
 
 
 class PrivacyValueDisallowChatParticipants(TLObject):
-    CONSTRUCTOR_ID = 0xacae0690
+    CONSTRUCTOR_ID = 0x41c87565
     SUBCLASS_OF_ID = 0xebb7f270
 
     def __init__(self, chats: List[int]):
@@ -19933,8 +20113,8 @@ class PrivacyValueDisallowChatParticipants(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x90\x06\xae\xac',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<i', x) for x in self.chats),
+            b'eu\xc8A',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.chats)),b''.join(struct.pack('<q', x) for x in self.chats),
         ))
 
     @classmethod
@@ -19942,7 +20122,7 @@ class PrivacyValueDisallowChatParticipants(TLObject):
         reader.read_int()
         _chats = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _chats.append(_x)
 
         return cls(chats=_chats)
@@ -19968,7 +20148,7 @@ class PrivacyValueDisallowContacts(TLObject):
 
 
 class PrivacyValueDisallowUsers(TLObject):
-    CONSTRUCTOR_ID = 0xc7f49b7
+    CONSTRUCTOR_ID = 0xe4621141
     SUBCLASS_OF_ID = 0xebb7f270
 
     def __init__(self, users: List[int]):
@@ -19985,8 +20165,8 @@ class PrivacyValueDisallowUsers(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xb7I\x7f\x0c',
-            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<i', x) for x in self.users),
+            b'A\x11b\xe4',
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.users)),b''.join(struct.pack('<q', x) for x in self.users),
         ))
 
     @classmethod
@@ -19994,7 +20174,7 @@ class PrivacyValueDisallowUsers(TLObject):
         reader.read_int()
         _users = []
         for _ in range(reader.read_int()):
-            _x = reader.read_int()
+            _x = reader.read_long()
             _users.append(_x)
 
         return cls(users=_users)
@@ -20034,7 +20214,7 @@ class ReceivedNotifyMessage(TLObject):
 
 
 class RecentMeUrlChat(TLObject):
-    CONSTRUCTOR_ID = 0xa01b22f9
+    CONSTRUCTOR_ID = 0xb2da71d2
     SUBCLASS_OF_ID = 0x55a53079
 
     def __init__(self, url: str, chat_id: int):
@@ -20053,15 +20233,15 @@ class RecentMeUrlChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xf9"\x1b\xa0',
+            b'\xd2q\xda\xb2',
             self.serialize_bytes(self.url),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _url = reader.tgread_string()
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(url=_url, chat_id=_chat_id)
 
 
@@ -20159,7 +20339,7 @@ class RecentMeUrlUnknown(TLObject):
 
 
 class RecentMeUrlUser(TLObject):
-    CONSTRUCTOR_ID = 0x8dbc3336
+    CONSTRUCTOR_ID = 0xb92c09e2
     SUBCLASS_OF_ID = 0x55a53079
 
     def __init__(self, url: str, user_id: int):
@@ -20178,15 +20358,15 @@ class RecentMeUrlUser(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'63\xbc\x8d',
+            b'\xe2\t,\xb9',
             self.serialize_bytes(self.url),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
         _url = reader.tgread_string()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         return cls(url=_url, user_id=_user_id)
 
 
@@ -21719,6 +21899,89 @@ class SendMessageChooseContactAction(TLObject):
         return cls()
 
 
+class SendMessageChooseStickerAction(TLObject):
+    CONSTRUCTOR_ID = 0xb05ac6b1
+    SUBCLASS_OF_ID = 0x20b2cc21
+
+    def to_dict(self):
+        return {
+            '_': 'SendMessageChooseStickerAction'
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xb1\xc6Z\xb0',
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        return cls()
+
+
+class SendMessageEmojiInteraction(TLObject):
+    CONSTRUCTOR_ID = 0x25972bcb
+    SUBCLASS_OF_ID = 0x20b2cc21
+
+    def __init__(self, emoticon: str, msg_id: int, interaction: 'TypeDataJSON'):
+        """
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
+        """
+        self.emoticon = emoticon
+        self.msg_id = msg_id
+        self.interaction = interaction
+
+    def to_dict(self):
+        return {
+            '_': 'SendMessageEmojiInteraction',
+            'emoticon': self.emoticon,
+            'msg_id': self.msg_id,
+            'interaction': self.interaction.to_dict() if isinstance(self.interaction, TLObject) else self.interaction
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\xcb+\x97%',
+            self.serialize_bytes(self.emoticon),
+            struct.pack('<i', self.msg_id),
+            self.interaction._bytes(),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _emoticon = reader.tgread_string()
+        _msg_id = reader.read_int()
+        _interaction = reader.tgread_object()
+        return cls(emoticon=_emoticon, msg_id=_msg_id, interaction=_interaction)
+
+
+class SendMessageEmojiInteractionSeen(TLObject):
+    CONSTRUCTOR_ID = 0xb665902e
+    SUBCLASS_OF_ID = 0x20b2cc21
+
+    def __init__(self, emoticon: str):
+        """
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
+        """
+        self.emoticon = emoticon
+
+    def to_dict(self):
+        return {
+            '_': 'SendMessageEmojiInteractionSeen',
+            'emoticon': self.emoticon
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'.\x90e\xb6',
+            self.serialize_bytes(self.emoticon),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _emoticon = reader.tgread_string()
+        return cls(emoticon=_emoticon)
+
+
 class SendMessageGamePlayAction(TLObject):
     CONSTRUCTOR_ID = 0xdd6a8f48
     SUBCLASS_OF_ID = 0x20b2cc21
@@ -21763,7 +22026,7 @@ class SendMessageHistoryImportAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -21867,7 +22130,7 @@ class SendMessageUploadAudioAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -21895,7 +22158,7 @@ class SendMessageUploadDocumentAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -21923,7 +22186,7 @@ class SendMessageUploadPhotoAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -21951,7 +22214,7 @@ class SendMessageUploadRoundAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -21979,7 +22242,7 @@ class SendMessageUploadVideoAction(TLObject):
 
     def __init__(self, progress: int):
         """
-        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction.
+        Constructor for SendMessageAction: Instance of either SendMessageTypingAction, SendMessageCancelAction, SendMessageRecordVideoAction, SendMessageUploadVideoAction, SendMessageRecordAudioAction, SendMessageUploadAudioAction, SendMessageUploadPhotoAction, SendMessageUploadDocumentAction, SendMessageGeoLocationAction, SendMessageChooseContactAction, SendMessageGamePlayAction, SendMessageRecordRoundAction, SendMessageUploadRoundAction, SpeakingInGroupCallAction, SendMessageHistoryImportAction, SendMessageChooseStickerAction, SendMessageEmojiInteraction, SendMessageEmojiInteractionSeen.
         """
         self.progress = progress
 
@@ -22182,6 +22445,64 @@ class SpeakingInGroupCallAction(TLObject):
         return cls()
 
 
+class SponsoredMessage(TLObject):
+    CONSTRUCTOR_ID = 0x2a3c381f
+    SUBCLASS_OF_ID = 0xe157d836
+
+    def __init__(self, from_id: 'TypePeer', message: str, random_id: bytes=None, start_param: Optional[str]=None, entities: Optional[List['TypeMessageEntity']]=None):
+        """
+        Constructor for SponsoredMessage: Instance of SponsoredMessage.
+        """
+        self.from_id = from_id
+        self.message = message
+        self.random_id = random_id if random_id is not None else int.from_bytes(os.urandom(4), 'big', signed=True)
+        self.start_param = start_param
+        self.entities = entities
+
+    def to_dict(self):
+        return {
+            '_': 'SponsoredMessage',
+            'from_id': self.from_id.to_dict() if isinstance(self.from_id, TLObject) else self.from_id,
+            'message': self.message,
+            'random_id': self.random_id,
+            'start_param': self.start_param,
+            'entities': [] if self.entities is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.entities]
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'\x1f8<*',
+            struct.pack('<I', (0 if self.start_param is None or self.start_param is False else 1) | (0 if self.entities is None or self.entities is False else 2)),
+            self.serialize_bytes(self.random_id),
+            self.from_id._bytes(),
+            b'' if self.start_param is None or self.start_param is False else (self.serialize_bytes(self.start_param)),
+            self.serialize_bytes(self.message),
+            b'' if self.entities is None or self.entities is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.entities)),b''.join(x._bytes() for x in self.entities))),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        flags = reader.read_int()
+
+        _random_id = reader.tgread_bytes()
+        _from_id = reader.tgread_object()
+        if flags & 1:
+            _start_param = reader.tgread_string()
+        else:
+            _start_param = None
+        _message = reader.tgread_string()
+        if flags & 2:
+            reader.read_int()
+            _entities = []
+            for _ in range(reader.read_int()):
+                _x = reader.tgread_object()
+                _entities.append(_x)
+
+        else:
+            _entities = None
+        return cls(from_id=_from_id, message=_message, random_id=_random_id, start_param=_start_param, entities=_entities)
+
+
 class StatsAbsValueAndPrev(TLObject):
     CONSTRUCTOR_ID = 0xcb43acde
     SUBCLASS_OF_ID = 0x3ebe59af
@@ -22341,7 +22662,7 @@ class StatsGraphError(TLObject):
 
 
 class StatsGroupTopAdmin(TLObject):
-    CONSTRUCTOR_ID = 0x6014f412
+    CONSTRUCTOR_ID = 0xd7584c87
     SUBCLASS_OF_ID = 0x80359c5d
 
     def __init__(self, user_id: int, deleted: int, kicked: int, banned: int):
@@ -22364,8 +22685,8 @@ class StatsGroupTopAdmin(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x12\xf4\x14`',
-            struct.pack('<I', self.user_id),
+            b'\x87LX\xd7',
+            struct.pack('<q', self.user_id),
             struct.pack('<i', self.deleted),
             struct.pack('<i', self.kicked),
             struct.pack('<i', self.banned),
@@ -22373,7 +22694,7 @@ class StatsGroupTopAdmin(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _deleted = reader.read_int()
         _kicked = reader.read_int()
         _banned = reader.read_int()
@@ -22381,7 +22702,7 @@ class StatsGroupTopAdmin(TLObject):
 
 
 class StatsGroupTopInviter(TLObject):
-    CONSTRUCTOR_ID = 0x31962a4c
+    CONSTRUCTOR_ID = 0x535f779d
     SUBCLASS_OF_ID = 0x85010c7a
 
     def __init__(self, user_id: int, invitations: int):
@@ -22400,20 +22721,20 @@ class StatsGroupTopInviter(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'L*\x961',
-            struct.pack('<I', self.user_id),
+            b'\x9dw_S',
+            struct.pack('<q', self.user_id),
             struct.pack('<i', self.invitations),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _invitations = reader.read_int()
         return cls(user_id=_user_id, invitations=_invitations)
 
 
 class StatsGroupTopPoster(TLObject):
-    CONSTRUCTOR_ID = 0x18f3d0f7
+    CONSTRUCTOR_ID = 0x9d04af9b
     SUBCLASS_OF_ID = 0x81c5ce23
 
     def __init__(self, user_id: int, messages: int, avg_chars: int):
@@ -22434,15 +22755,15 @@ class StatsGroupTopPoster(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xf7\xd0\xf3\x18',
-            struct.pack('<I', self.user_id),
+            b'\x9b\xaf\x04\x9d',
+            struct.pack('<q', self.user_id),
             struct.pack('<i', self.messages),
             struct.pack('<i', self.avg_chars),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _messages = reader.read_int()
         _avg_chars = reader.read_int()
         return cls(user_id=_user_id, messages=_messages, avg_chars=_avg_chars)
@@ -23187,11 +23508,11 @@ class TextUrl(TLObject):
 
 
 class Theme(TLObject):
-    CONSTRUCTOR_ID = 0x28f1114
+    CONSTRUCTOR_ID = 0xe802b8dc
     SUBCLASS_OF_ID = 0x56b4c80c
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, id: int, access_hash: int, slug: str, title: str, installs_count: int, creator: Optional[bool]=None, default: Optional[bool]=None, document: Optional['TypeDocument']=None, settings: Optional['TypeThemeSettings']=None):
+    def __init__(self, id: int, access_hash: int, slug: str, title: str, creator: Optional[bool]=None, default: Optional[bool]=None, for_chat: Optional[bool]=None, document: Optional['TypeDocument']=None, settings: Optional['TypeThemeSettings']=None, installs_count: Optional[int]=None):
         """
         Constructor for Theme: Instance of Theme.
         """
@@ -23199,11 +23520,12 @@ class Theme(TLObject):
         self.access_hash = access_hash
         self.slug = slug
         self.title = title
-        self.installs_count = installs_count
         self.creator = creator
         self.default = default
+        self.for_chat = for_chat
         self.document = document
         self.settings = settings
+        self.installs_count = installs_count
 
     def to_dict(self):
         return {
@@ -23212,24 +23534,25 @@ class Theme(TLObject):
             'access_hash': self.access_hash,
             'slug': self.slug,
             'title': self.title,
-            'installs_count': self.installs_count,
             'creator': self.creator,
             'default': self.default,
+            'for_chat': self.for_chat,
             'document': self.document.to_dict() if isinstance(self.document, TLObject) else self.document,
-            'settings': self.settings.to_dict() if isinstance(self.settings, TLObject) else self.settings
+            'settings': self.settings.to_dict() if isinstance(self.settings, TLObject) else self.settings,
+            'installs_count': self.installs_count
         }
 
     def _bytes(self):
         return b''.join((
-            b'\x14\x11\x8f\x02',
-            struct.pack('<I', (0 if self.creator is None or self.creator is False else 1) | (0 if self.default is None or self.default is False else 2) | (0 if self.document is None or self.document is False else 4) | (0 if self.settings is None or self.settings is False else 8)),
+            b'\xdc\xb8\x02\xe8',
+            struct.pack('<I', (0 if self.creator is None or self.creator is False else 1) | (0 if self.default is None or self.default is False else 2) | (0 if self.for_chat is None or self.for_chat is False else 32) | (0 if self.document is None or self.document is False else 4) | (0 if self.settings is None or self.settings is False else 8) | (0 if self.installs_count is None or self.installs_count is False else 16)),
             struct.pack('<q', self.id),
             struct.pack('<q', self.access_hash),
             self.serialize_bytes(self.slug),
             self.serialize_bytes(self.title),
             b'' if self.document is None or self.document is False else (self.document._bytes()),
             b'' if self.settings is None or self.settings is False else (self.settings._bytes()),
-            struct.pack('<i', self.installs_count),
+            b'' if self.installs_count is None or self.installs_count is False else (struct.pack('<i', self.installs_count)),
         ))
 
     @classmethod
@@ -23238,6 +23561,7 @@ class Theme(TLObject):
 
         _creator = bool(flags & 1)
         _default = bool(flags & 2)
+        _for_chat = bool(flags & 32)
         _id = reader.read_long()
         _access_hash = reader.read_long()
         _slug = reader.tgread_string()
@@ -23250,22 +23574,26 @@ class Theme(TLObject):
             _settings = reader.tgread_object()
         else:
             _settings = None
-        _installs_count = reader.read_int()
-        return cls(id=_id, access_hash=_access_hash, slug=_slug, title=_title, installs_count=_installs_count, creator=_creator, default=_default, document=_document, settings=_settings)
+        if flags & 16:
+            _installs_count = reader.read_int()
+        else:
+            _installs_count = None
+        return cls(id=_id, access_hash=_access_hash, slug=_slug, title=_title, creator=_creator, default=_default, for_chat=_for_chat, document=_document, settings=_settings, installs_count=_installs_count)
 
 
 class ThemeSettings(TLObject):
-    CONSTRUCTOR_ID = 0x9c14984a
+    CONSTRUCTOR_ID = 0xfa58b6d4
     SUBCLASS_OF_ID = 0x82666d38
 
-    def __init__(self, base_theme: 'TypeBaseTheme', accent_color: int, message_top_color: Optional[int]=None, message_bottom_color: Optional[int]=None, wallpaper: Optional['TypeWallPaper']=None):
+    def __init__(self, base_theme: 'TypeBaseTheme', accent_color: int, message_colors_animated: Optional[bool]=None, outbox_accent_color: Optional[int]=None, message_colors: Optional[List[int]]=None, wallpaper: Optional['TypeWallPaper']=None):
         """
         Constructor for ThemeSettings: Instance of ThemeSettings.
         """
         self.base_theme = base_theme
         self.accent_color = accent_color
-        self.message_top_color = message_top_color
-        self.message_bottom_color = message_bottom_color
+        self.message_colors_animated = message_colors_animated
+        self.outbox_accent_color = outbox_accent_color
+        self.message_colors = message_colors
         self.wallpaper = wallpaper
 
     def to_dict(self):
@@ -23273,20 +23601,20 @@ class ThemeSettings(TLObject):
             '_': 'ThemeSettings',
             'base_theme': self.base_theme.to_dict() if isinstance(self.base_theme, TLObject) else self.base_theme,
             'accent_color': self.accent_color,
-            'message_top_color': self.message_top_color,
-            'message_bottom_color': self.message_bottom_color,
+            'message_colors_animated': self.message_colors_animated,
+            'outbox_accent_color': self.outbox_accent_color,
+            'message_colors': [] if self.message_colors is None else self.message_colors[:],
             'wallpaper': self.wallpaper.to_dict() if isinstance(self.wallpaper, TLObject) else self.wallpaper
         }
 
     def _bytes(self):
-        assert ((self.message_top_color or self.message_top_color is not None) and (self.message_bottom_color or self.message_bottom_color is not None)) or ((self.message_top_color is None or self.message_top_color is False) and (self.message_bottom_color is None or self.message_bottom_color is False)), 'message_top_color, message_bottom_color parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'J\x98\x14\x9c',
-            struct.pack('<I', (0 if self.message_top_color is None or self.message_top_color is False else 1) | (0 if self.message_bottom_color is None or self.message_bottom_color is False else 1) | (0 if self.wallpaper is None or self.wallpaper is False else 2)),
+            b'\xd4\xb6X\xfa',
+            struct.pack('<I', (0 if self.message_colors_animated is None or self.message_colors_animated is False else 4) | (0 if self.outbox_accent_color is None or self.outbox_accent_color is False else 8) | (0 if self.message_colors is None or self.message_colors is False else 1) | (0 if self.wallpaper is None or self.wallpaper is False else 2)),
             self.base_theme._bytes(),
             struct.pack('<i', self.accent_color),
-            b'' if self.message_top_color is None or self.message_top_color is False else (struct.pack('<i', self.message_top_color)),
-            b'' if self.message_bottom_color is None or self.message_bottom_color is False else (struct.pack('<i', self.message_bottom_color)),
+            b'' if self.outbox_accent_color is None or self.outbox_accent_color is False else (struct.pack('<i', self.outbox_accent_color)),
+            b'' if self.message_colors is None or self.message_colors is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.message_colors)),b''.join(struct.pack('<i', x) for x in self.message_colors))),
             b'' if self.wallpaper is None or self.wallpaper is False else (self.wallpaper._bytes()),
         ))
 
@@ -23294,21 +23622,27 @@ class ThemeSettings(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
+        _message_colors_animated = bool(flags & 4)
         _base_theme = reader.tgread_object()
         _accent_color = reader.read_int()
-        if flags & 1:
-            _message_top_color = reader.read_int()
+        if flags & 8:
+            _outbox_accent_color = reader.read_int()
         else:
-            _message_top_color = None
+            _outbox_accent_color = None
         if flags & 1:
-            _message_bottom_color = reader.read_int()
+            reader.read_int()
+            _message_colors = []
+            for _ in range(reader.read_int()):
+                _x = reader.read_int()
+                _message_colors.append(_x)
+
         else:
-            _message_bottom_color = None
+            _message_colors = None
         if flags & 2:
             _wallpaper = reader.tgread_object()
         else:
             _wallpaper = None
-        return cls(base_theme=_base_theme, accent_color=_accent_color, message_top_color=_message_top_color, message_bottom_color=_message_bottom_color, wallpaper=_wallpaper)
+        return cls(base_theme=_base_theme, accent_color=_accent_color, message_colors_animated=_message_colors_animated, outbox_accent_color=_outbox_accent_color, message_colors=_message_colors, wallpaper=_wallpaper)
 
 
 class TlsBlockDomain(TLObject):
@@ -23752,12 +24086,12 @@ class TopPeerCategoryPhoneCalls(TLObject):
 
 
 class UpdateBotCallbackQuery(TLObject):
-    CONSTRUCTOR_ID = 0xe73547e1
+    CONSTRUCTOR_ID = 0xb9cfc48d
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, query_id: int, user_id: int, peer: 'TypePeer', msg_id: int, chat_instance: int, data: Optional[bytes]=None, game_short_name: Optional[str]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.user_id = user_id
@@ -23781,10 +24115,10 @@ class UpdateBotCallbackQuery(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xe1G5\xe7',
+            b'\x8d\xc4\xcf\xb9',
             struct.pack('<I', (0 if self.data is None or self.data is False else 1) | (0 if self.game_short_name is None or self.game_short_name is False else 2)),
             struct.pack('<q', self.query_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.peer._bytes(),
             struct.pack('<i', self.msg_id),
             struct.pack('<q', self.chat_instance),
@@ -23797,7 +24131,7 @@ class UpdateBotCallbackQuery(TLObject):
         flags = reader.read_int()
 
         _query_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _peer = reader.tgread_object()
         _msg_id = reader.read_int()
         _chat_instance = reader.read_long()
@@ -23812,13 +24146,54 @@ class UpdateBotCallbackQuery(TLObject):
         return cls(query_id=_query_id, user_id=_user_id, peer=_peer, msg_id=_msg_id, chat_instance=_chat_instance, data=_data, game_short_name=_game_short_name)
 
 
+class UpdateBotCommands(TLObject):
+    CONSTRUCTOR_ID = 0x4d712f2e
+    SUBCLASS_OF_ID = 0x9f89304e
+
+    def __init__(self, peer: 'TypePeer', bot_id: int, commands: List['TypeBotCommand']):
+        """
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
+        """
+        self.peer = peer
+        self.bot_id = bot_id
+        self.commands = commands
+
+    def to_dict(self):
+        return {
+            '_': 'UpdateBotCommands',
+            'peer': self.peer.to_dict() if isinstance(self.peer, TLObject) else self.peer,
+            'bot_id': self.bot_id,
+            'commands': [] if self.commands is None else [x.to_dict() if isinstance(x, TLObject) else x for x in self.commands]
+        }
+
+    def _bytes(self):
+        return b''.join((
+            b'./qM',
+            self.peer._bytes(),
+            struct.pack('<q', self.bot_id),
+            b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.commands)),b''.join(x._bytes() for x in self.commands),
+        ))
+
+    @classmethod
+    def from_reader(cls, reader):
+        _peer = reader.tgread_object()
+        _bot_id = reader.read_long()
+        reader.read_int()
+        _commands = []
+        for _ in range(reader.read_int()):
+            _x = reader.tgread_object()
+            _commands.append(_x)
+
+        return cls(peer=_peer, bot_id=_bot_id, commands=_commands)
+
+
 class UpdateBotInlineQuery(TLObject):
-    CONSTRUCTOR_ID = 0x3f2038db
+    CONSTRUCTOR_ID = 0x496f379c
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, query_id: int, user_id: int, query: str, offset: str, geo: Optional['TypeGeoPoint']=None, peer_type: Optional['TypeInlineQueryPeerType']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.user_id = user_id
@@ -23840,10 +24215,10 @@ class UpdateBotInlineQuery(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xdb8 ?',
+            b'\x9c7oI',
             struct.pack('<I', (0 if self.geo is None or self.geo is False else 1) | (0 if self.peer_type is None or self.peer_type is False else 2)),
             struct.pack('<q', self.query_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.query),
             b'' if self.geo is None or self.geo is False else (self.geo._bytes()),
             b'' if self.peer_type is None or self.peer_type is False else (self.peer_type._bytes()),
@@ -23855,7 +24230,7 @@ class UpdateBotInlineQuery(TLObject):
         flags = reader.read_int()
 
         _query_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _query = reader.tgread_string()
         if flags & 1:
             _geo = reader.tgread_object()
@@ -23870,13 +24245,13 @@ class UpdateBotInlineQuery(TLObject):
 
 
 class UpdateBotInlineSend(TLObject):
-    CONSTRUCTOR_ID = 0xe48f964
+    CONSTRUCTOR_ID = 0x12f12a07
     SUBCLASS_OF_ID = 0x9f89304e
 
     # noinspection PyShadowingBuiltins
     def __init__(self, user_id: int, query: str, id: str, geo: Optional['TypeGeoPoint']=None, msg_id: Optional['TypeInputBotInlineMessageID']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.query = query
@@ -23896,9 +24271,9 @@ class UpdateBotInlineSend(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'd\xf9H\x0e',
+            b'\x07*\xf1\x12',
             struct.pack('<I', (0 if self.geo is None or self.geo is False else 1) | (0 if self.msg_id is None or self.msg_id is False else 2)),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.query),
             b'' if self.geo is None or self.geo is False else (self.geo._bytes()),
             self.serialize_bytes(self.id),
@@ -23909,7 +24284,7 @@ class UpdateBotInlineSend(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _query = reader.tgread_string()
         if flags & 1:
             _geo = reader.tgread_object()
@@ -23924,12 +24299,12 @@ class UpdateBotInlineSend(TLObject):
 
 
 class UpdateBotPrecheckoutQuery(TLObject):
-    CONSTRUCTOR_ID = 0x5d2f3aa9
+    CONSTRUCTOR_ID = 0x8caa9a96
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, query_id: int, user_id: int, payload: bytes, currency: str, total_amount: int, info: Optional['TypePaymentRequestedInfo']=None, shipping_option_id: Optional[str]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.user_id = user_id
@@ -23953,10 +24328,10 @@ class UpdateBotPrecheckoutQuery(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xa9:/]',
+            b'\x96\x9a\xaa\x8c',
             struct.pack('<I', (0 if self.info is None or self.info is False else 1) | (0 if self.shipping_option_id is None or self.shipping_option_id is False else 2)),
             struct.pack('<q', self.query_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.payload),
             b'' if self.info is None or self.info is False else (self.info._bytes()),
             b'' if self.shipping_option_id is None or self.shipping_option_id is False else (self.serialize_bytes(self.shipping_option_id)),
@@ -23969,7 +24344,7 @@ class UpdateBotPrecheckoutQuery(TLObject):
         flags = reader.read_int()
 
         _query_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _payload = reader.tgread_bytes()
         if flags & 1:
             _info = reader.tgread_object()
@@ -23985,12 +24360,12 @@ class UpdateBotPrecheckoutQuery(TLObject):
 
 
 class UpdateBotShippingQuery(TLObject):
-    CONSTRUCTOR_ID = 0xe0cdc940
+    CONSTRUCTOR_ID = 0xb5aefd7d
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, query_id: int, user_id: int, payload: bytes, shipping_address: 'TypePostAddress'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.user_id = user_id
@@ -24008,9 +24383,9 @@ class UpdateBotShippingQuery(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'@\xc9\xcd\xe0',
+            b'}\xfd\xae\xb5',
             struct.pack('<q', self.query_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.payload),
             self.shipping_address._bytes(),
         ))
@@ -24018,19 +24393,19 @@ class UpdateBotShippingQuery(TLObject):
     @classmethod
     def from_reader(cls, reader):
         _query_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _payload = reader.tgread_bytes()
         _shipping_address = reader.tgread_object()
         return cls(query_id=_query_id, user_id=_user_id, payload=_payload, shipping_address=_shipping_address)
 
 
 class UpdateBotStopped(TLObject):
-    CONSTRUCTOR_ID = 0x7f9488a
+    CONSTRUCTOR_ID = 0xc4870a49
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, date: Optional[datetime], stopped: bool, qts: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.date = date
@@ -24048,8 +24423,8 @@ class UpdateBotStopped(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x8aH\xf9\x07',
-            struct.pack('<I', self.user_id),
+            b'I\n\x87\xc4',
+            struct.pack('<q', self.user_id),
             self.serialize_datetime(self.date),
             b'\xb5ur\x99' if self.stopped else b'7\x97y\xbc',
             struct.pack('<i', self.qts),
@@ -24057,7 +24432,7 @@ class UpdateBotStopped(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _date = reader.tgread_date()
         _stopped = reader.tgread_bool()
         _qts = reader.read_int()
@@ -24070,7 +24445,7 @@ class UpdateBotWebhookJSON(TLObject):
 
     def __init__(self, data: 'TypeDataJSON'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.data = data
 
@@ -24098,7 +24473,7 @@ class UpdateBotWebhookJSONQuery(TLObject):
 
     def __init__(self, query_id: int, data: 'TypeDataJSON', timeout: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.data = data
@@ -24129,12 +24504,12 @@ class UpdateBotWebhookJSONQuery(TLObject):
 
 
 class UpdateChannel(TLObject):
-    CONSTRUCTOR_ID = 0xb6d45656
+    CONSTRUCTOR_ID = 0x635b4c09
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
 
@@ -24146,23 +24521,23 @@ class UpdateChannel(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'VV\xd4\xb6',
-            struct.pack('<i', self.channel_id),
+            b'\tL[c',
+            struct.pack('<q', self.channel_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         return cls(channel_id=_channel_id)
 
 
 class UpdateChannelAvailableMessages(TLObject):
-    CONSTRUCTOR_ID = 0x70db6837
+    CONSTRUCTOR_ID = 0xb23fc698
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, available_min_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.available_min_id = available_min_id
@@ -24176,26 +24551,26 @@ class UpdateChannelAvailableMessages(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'7h\xdbp',
-            struct.pack('<i', self.channel_id),
+            b'\x98\xc6?\xb2',
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.available_min_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _available_min_id = reader.read_int()
         return cls(channel_id=_channel_id, available_min_id=_available_min_id)
 
 
 class UpdateChannelMessageForwards(TLObject):
-    CONSTRUCTOR_ID = 0x6e8a84df
+    CONSTRUCTOR_ID = 0xd29a27f4
     SUBCLASS_OF_ID = 0x9f89304e
 
     # noinspection PyShadowingBuiltins
     def __init__(self, channel_id: int, id: int, forwards: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.id = id
@@ -24211,28 +24586,28 @@ class UpdateChannelMessageForwards(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xdf\x84\x8an',
-            struct.pack('<i', self.channel_id),
+            b"\xf4'\x9a\xd2",
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.id),
             struct.pack('<i', self.forwards),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _id = reader.read_int()
         _forwards = reader.read_int()
         return cls(channel_id=_channel_id, id=_id, forwards=_forwards)
 
 
 class UpdateChannelMessageViews(TLObject):
-    CONSTRUCTOR_ID = 0x98a12b4b
+    CONSTRUCTOR_ID = 0xf226ac08
     SUBCLASS_OF_ID = 0x9f89304e
 
     # noinspection PyShadowingBuiltins
     def __init__(self, channel_id: int, id: int, views: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.id = id
@@ -24248,27 +24623,27 @@ class UpdateChannelMessageViews(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'K+\xa1\x98',
-            struct.pack('<i', self.channel_id),
+            b'\x08\xac&\xf2',
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.id),
             struct.pack('<i', self.views),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _id = reader.read_int()
         _views = reader.read_int()
         return cls(channel_id=_channel_id, id=_id, views=_views)
 
 
 class UpdateChannelParticipant(TLObject):
-    CONSTRUCTOR_ID = 0x7fecb1ec
+    CONSTRUCTOR_ID = 0x985d3abb
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, date: Optional[datetime], actor_id: int, user_id: int, qts: int, prev_participant: Optional['TypeChannelParticipant']=None, new_participant: Optional['TypeChannelParticipant']=None, invite: Optional['TypeExportedChatInvite']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.date = date
@@ -24294,12 +24669,12 @@ class UpdateChannelParticipant(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xec\xb1\xec\x7f',
+            b'\xbb:]\x98',
             struct.pack('<I', (0 if self.prev_participant is None or self.prev_participant is False else 1) | (0 if self.new_participant is None or self.new_participant is False else 2) | (0 if self.invite is None or self.invite is False else 4)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.actor_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.actor_id),
+            struct.pack('<q', self.user_id),
             b'' if self.prev_participant is None or self.prev_participant is False else (self.prev_participant._bytes()),
             b'' if self.new_participant is None or self.new_participant is False else (self.new_participant._bytes()),
             b'' if self.invite is None or self.invite is False else (self.invite._bytes()),
@@ -24310,10 +24685,10 @@ class UpdateChannelParticipant(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _date = reader.tgread_date()
-        _actor_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _actor_id = reader.read_long()
+        _user_id = reader.read_long()
         if flags & 1:
             _prev_participant = reader.tgread_object()
         else:
@@ -24331,12 +24706,12 @@ class UpdateChannelParticipant(TLObject):
 
 
 class UpdateChannelReadMessagesContents(TLObject):
-    CONSTRUCTOR_ID = 0x89893b45
+    CONSTRUCTOR_ID = 0x44bdd535
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, messages: List[int]):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.messages = messages
@@ -24350,14 +24725,14 @@ class UpdateChannelReadMessagesContents(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'E;\x89\x89',
-            struct.pack('<i', self.channel_id),
+            b'5\xd5\xbdD',
+            struct.pack('<q', self.channel_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.messages)),b''.join(struct.pack('<i', x) for x in self.messages),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         reader.read_int()
         _messages = []
         for _ in range(reader.read_int()):
@@ -24368,12 +24743,12 @@ class UpdateChannelReadMessagesContents(TLObject):
 
 
 class UpdateChannelTooLong(TLObject):
-    CONSTRUCTOR_ID = 0xeb0467fb
+    CONSTRUCTOR_ID = 0x108d941f
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, pts: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.pts = pts
@@ -24387,9 +24762,9 @@ class UpdateChannelTooLong(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xfbg\x04\xeb',
+            b'\x1f\x94\x8d\x10',
             struct.pack('<I', (0 if self.pts is None or self.pts is False else 1)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             b'' if self.pts is None or self.pts is False else (struct.pack('<i', self.pts)),
         ))
 
@@ -24397,7 +24772,7 @@ class UpdateChannelTooLong(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         if flags & 1:
             _pts = reader.read_int()
         else:
@@ -24406,12 +24781,12 @@ class UpdateChannelTooLong(TLObject):
 
 
 class UpdateChannelUserTyping(TLObject):
-    CONSTRUCTOR_ID = 0x6b171718
+    CONSTRUCTOR_ID = 0x8c88c923
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, from_id: 'TypePeer', action: 'TypeSendMessageAction', top_msg_id: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.from_id = from_id
@@ -24429,9 +24804,9 @@ class UpdateChannelUserTyping(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x18\x17\x17k',
+            b'#\xc9\x88\x8c',
             struct.pack('<I', (0 if self.top_msg_id is None or self.top_msg_id is False else 1)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             b'' if self.top_msg_id is None or self.top_msg_id is False else (struct.pack('<i', self.top_msg_id)),
             self.from_id._bytes(),
             self.action._bytes(),
@@ -24441,7 +24816,7 @@ class UpdateChannelUserTyping(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         if flags & 1:
             _top_msg_id = reader.read_int()
         else:
@@ -24452,12 +24827,12 @@ class UpdateChannelUserTyping(TLObject):
 
 
 class UpdateChannelWebPage(TLObject):
-    CONSTRUCTOR_ID = 0x40771900
+    CONSTRUCTOR_ID = 0x2f2ba99f
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, webpage: 'TypeWebPage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.webpage = webpage
@@ -24475,8 +24850,8 @@ class UpdateChannelWebPage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x00\x19w@',
-            struct.pack('<i', self.channel_id),
+            b'\x9f\xa9+/',
+            struct.pack('<q', self.channel_id),
             self.webpage._bytes(),
             struct.pack('<i', self.pts),
             struct.pack('<i', self.pts_count),
@@ -24484,7 +24859,7 @@ class UpdateChannelWebPage(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _webpage = reader.tgread_object()
         _pts = reader.read_int()
         _pts_count = reader.read_int()
@@ -24492,12 +24867,12 @@ class UpdateChannelWebPage(TLObject):
 
 
 class UpdateChat(TLObject):
-    CONSTRUCTOR_ID = 0x1330a196
+    CONSTRUCTOR_ID = 0xf89a6a4e
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
 
@@ -24509,13 +24884,13 @@ class UpdateChat(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x96\xa10\x13',
-            struct.pack('<i', self.chat_id),
+            b'Nj\x9a\xf8',
+            struct.pack('<q', self.chat_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         return cls(chat_id=_chat_id)
 
 
@@ -24525,7 +24900,7 @@ class UpdateChatDefaultBannedRights(TLObject):
 
     def __init__(self, peer: 'TypePeer', default_banned_rights: 'TypeChatBannedRights', version: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.default_banned_rights = default_banned_rights
@@ -24556,12 +24931,12 @@ class UpdateChatDefaultBannedRights(TLObject):
 
 
 class UpdateChatParticipant(TLObject):
-    CONSTRUCTOR_ID = 0xf3b3781f
+    CONSTRUCTOR_ID = 0xd087663a
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, date: Optional[datetime], actor_id: int, user_id: int, qts: int, prev_participant: Optional['TypeChatParticipant']=None, new_participant: Optional['TypeChatParticipant']=None, invite: Optional['TypeExportedChatInvite']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.date = date
@@ -24587,12 +24962,12 @@ class UpdateChatParticipant(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x1fx\xb3\xf3',
+            b':f\x87\xd0',
             struct.pack('<I', (0 if self.prev_participant is None or self.prev_participant is False else 1) | (0 if self.new_participant is None or self.new_participant is False else 2) | (0 if self.invite is None or self.invite is False else 4)),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.chat_id),
             self.serialize_datetime(self.date),
-            struct.pack('<i', self.actor_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.actor_id),
+            struct.pack('<q', self.user_id),
             b'' if self.prev_participant is None or self.prev_participant is False else (self.prev_participant._bytes()),
             b'' if self.new_participant is None or self.new_participant is False else (self.new_participant._bytes()),
             b'' if self.invite is None or self.invite is False else (self.invite._bytes()),
@@ -24603,10 +24978,10 @@ class UpdateChatParticipant(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _date = reader.tgread_date()
-        _actor_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _actor_id = reader.read_long()
+        _user_id = reader.read_long()
         if flags & 1:
             _prev_participant = reader.tgread_object()
         else:
@@ -24624,12 +24999,12 @@ class UpdateChatParticipant(TLObject):
 
 
 class UpdateChatParticipantAdd(TLObject):
-    CONSTRUCTOR_ID = 0xea4b0e5c
+    CONSTRUCTOR_ID = 0x3dda5451
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, user_id: int, inviter_id: int, date: Optional[datetime], version: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.user_id = user_id
@@ -24649,31 +25024,31 @@ class UpdateChatParticipantAdd(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\\\x0eK\xea',
-            struct.pack('<i', self.chat_id),
-            struct.pack('<I', self.user_id),
-            struct.pack('<i', self.inviter_id),
+            b'QT\xda=',
+            struct.pack('<q', self.chat_id),
+            struct.pack('<q', self.user_id),
+            struct.pack('<q', self.inviter_id),
             self.serialize_datetime(self.date),
             struct.pack('<i', self.version),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
-        _inviter_id = reader.read_int()
+        _chat_id = reader.read_long()
+        _user_id = reader.read_long()
+        _inviter_id = reader.read_long()
         _date = reader.tgread_date()
         _version = reader.read_int()
         return cls(chat_id=_chat_id, user_id=_user_id, inviter_id=_inviter_id, date=_date, version=_version)
 
 
 class UpdateChatParticipantAdmin(TLObject):
-    CONSTRUCTOR_ID = 0xb6901959
+    CONSTRUCTOR_ID = 0xd7ca61a2
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, user_id: int, is_admin: bool, version: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.user_id = user_id
@@ -24691,29 +25066,29 @@ class UpdateChatParticipantAdmin(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'Y\x19\x90\xb6',
-            struct.pack('<i', self.chat_id),
-            struct.pack('<I', self.user_id),
+            b'\xa2a\xca\xd7',
+            struct.pack('<q', self.chat_id),
+            struct.pack('<q', self.user_id),
             b'\xb5ur\x99' if self.is_admin else b'7\x97y\xbc',
             struct.pack('<i', self.version),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _chat_id = reader.read_long()
+        _user_id = reader.read_long()
         _is_admin = reader.tgread_bool()
         _version = reader.read_int()
         return cls(chat_id=_chat_id, user_id=_user_id, is_admin=_is_admin, version=_version)
 
 
 class UpdateChatParticipantDelete(TLObject):
-    CONSTRUCTOR_ID = 0x6e5f8c22
+    CONSTRUCTOR_ID = 0xe32f3d77
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, user_id: int, version: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.user_id = user_id
@@ -24729,16 +25104,16 @@ class UpdateChatParticipantDelete(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'"\x8c_n',
-            struct.pack('<i', self.chat_id),
-            struct.pack('<I', self.user_id),
+            b'w=/\xe3',
+            struct.pack('<q', self.chat_id),
+            struct.pack('<q', self.user_id),
             struct.pack('<i', self.version),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _chat_id = reader.read_long()
+        _user_id = reader.read_long()
         _version = reader.read_int()
         return cls(chat_id=_chat_id, user_id=_user_id, version=_version)
 
@@ -24749,7 +25124,7 @@ class UpdateChatParticipants(TLObject):
 
     def __init__(self, participants: 'TypeChatParticipants'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.participants = participants
 
@@ -24772,12 +25147,12 @@ class UpdateChatParticipants(TLObject):
 
 
 class UpdateChatUserTyping(TLObject):
-    CONSTRUCTOR_ID = 0x86cadb6c
+    CONSTRUCTOR_ID = 0x83487af0
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, from_id: 'TypePeer', action: 'TypeSendMessageAction'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.from_id = from_id
@@ -24793,15 +25168,15 @@ class UpdateChatUserTyping(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'l\xdb\xca\x86',
-            struct.pack('<i', self.chat_id),
+            b'\xf0zH\x83',
+            struct.pack('<q', self.chat_id),
             self.from_id._bytes(),
             self.action._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _from_id = reader.tgread_object()
         _action = reader.tgread_object()
         return cls(chat_id=_chat_id, from_id=_from_id, action=_action)
@@ -24851,7 +25226,7 @@ class UpdateDcOptions(TLObject):
 
     def __init__(self, dc_options: List['TypeDcOption']):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.dc_options = dc_options
 
@@ -24879,12 +25254,12 @@ class UpdateDcOptions(TLObject):
 
 
 class UpdateDeleteChannelMessages(TLObject):
-    CONSTRUCTOR_ID = 0xc37521c9
+    CONSTRUCTOR_ID = 0xc32d5b12
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, messages: List[int], pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.messages = messages
@@ -24902,8 +25277,8 @@ class UpdateDeleteChannelMessages(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xc9!u\xc3',
-            struct.pack('<i', self.channel_id),
+            b'\x12[-\xc3',
+            struct.pack('<q', self.channel_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.messages)),b''.join(struct.pack('<i', x) for x in self.messages),
             struct.pack('<i', self.pts),
             struct.pack('<i', self.pts_count),
@@ -24911,7 +25286,7 @@ class UpdateDeleteChannelMessages(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         reader.read_int()
         _messages = []
         for _ in range(reader.read_int()):
@@ -24929,7 +25304,7 @@ class UpdateDeleteMessages(TLObject):
 
     def __init__(self, messages: List[int], pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.messages = messages
         self.pts = pts
@@ -24970,7 +25345,7 @@ class UpdateDeleteScheduledMessages(TLObject):
 
     def __init__(self, peer: 'TypePeer', messages: List[int]):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.messages = messages
@@ -25008,7 +25383,7 @@ class UpdateDialogFilter(TLObject):
     # noinspection PyShadowingBuiltins
     def __init__(self, id: int, filter: Optional['TypeDialogFilter']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.id = id
         self.filter = filter
@@ -25046,7 +25421,7 @@ class UpdateDialogFilterOrder(TLObject):
 
     def __init__(self, order: List[int]):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.order = order
 
@@ -25098,7 +25473,7 @@ class UpdateDialogPinned(TLObject):
 
     def __init__(self, peer: 'TypeDialogPeer', pinned: Optional[bool]=None, folder_id: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.pinned = pinned
@@ -25139,7 +25514,7 @@ class UpdateDialogUnreadMark(TLObject):
 
     def __init__(self, peer: 'TypeDialogPeer', unread: Optional[bool]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.unread = unread
@@ -25173,7 +25548,7 @@ class UpdateDraftMessage(TLObject):
 
     def __init__(self, peer: 'TypePeer', draft: 'TypeDraftMessage'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.draft = draft
@@ -25205,7 +25580,7 @@ class UpdateEditChannelMessage(TLObject):
 
     def __init__(self, message: 'TypeMessage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
         self.pts = pts
@@ -25241,7 +25616,7 @@ class UpdateEditMessage(TLObject):
 
     def __init__(self, message: 'TypeMessage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
         self.pts = pts
@@ -25277,7 +25652,7 @@ class UpdateEncryptedChatTyping(TLObject):
 
     def __init__(self, chat_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
 
@@ -25305,7 +25680,7 @@ class UpdateEncryptedMessagesRead(TLObject):
 
     def __init__(self, chat_id: int, max_date: Optional[datetime], date: Optional[datetime]):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.max_date = max_date
@@ -25341,7 +25716,7 @@ class UpdateEncryption(TLObject):
 
     def __init__(self, chat: 'TypeEncryptedChat', date: Optional[datetime]):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat = chat
         self.date = date
@@ -25392,7 +25767,7 @@ class UpdateFolderPeers(TLObject):
 
     def __init__(self, folder_peers: List['TypeFolderPeer'], pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.folder_peers = folder_peers
         self.pts = pts
@@ -25433,7 +25808,7 @@ class UpdateGeoLiveViewed(TLObject):
 
     def __init__(self, peer: 'TypePeer', msg_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.msg_id = msg_id
@@ -25460,12 +25835,12 @@ class UpdateGeoLiveViewed(TLObject):
 
 
 class UpdateGroupCall(TLObject):
-    CONSTRUCTOR_ID = 0xa45eb99b
+    CONSTRUCTOR_ID = 0x14b24500
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, chat_id: int, call: 'TypeGroupCall'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.chat_id = chat_id
         self.call = call
@@ -25479,14 +25854,14 @@ class UpdateGroupCall(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x9b\xb9^\xa4',
-            struct.pack('<i', self.chat_id),
+            b'\x00E\xb2\x14',
+            struct.pack('<q', self.chat_id),
             self.call._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _chat_id = reader.read_int()
+        _chat_id = reader.read_long()
         _call = reader.tgread_object()
         return cls(chat_id=_chat_id, call=_call)
 
@@ -25497,7 +25872,7 @@ class UpdateGroupCallConnection(TLObject):
 
     def __init__(self, params: 'TypeDataJSON', presentation: Optional[bool]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.params = params
         self.presentation = presentation
@@ -25531,7 +25906,7 @@ class UpdateGroupCallParticipants(TLObject):
 
     def __init__(self, call: 'TypeInputGroupCall', participants: List['TypeGroupCallParticipant'], version: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.call = call
         self.participants = participants
@@ -25567,12 +25942,12 @@ class UpdateGroupCallParticipants(TLObject):
 
 
 class UpdateInlineBotCallbackQuery(TLObject):
-    CONSTRUCTOR_ID = 0xf9d27a5a
+    CONSTRUCTOR_ID = 0x691e9052
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, query_id: int, user_id: int, msg_id: 'TypeInputBotInlineMessageID', chat_instance: int, data: Optional[bytes]=None, game_short_name: Optional[str]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.query_id = query_id
         self.user_id = user_id
@@ -25594,10 +25969,10 @@ class UpdateInlineBotCallbackQuery(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'Zz\xd2\xf9',
+            b'R\x90\x1ei',
             struct.pack('<I', (0 if self.data is None or self.data is False else 1) | (0 if self.game_short_name is None or self.game_short_name is False else 2)),
             struct.pack('<q', self.query_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.msg_id._bytes(),
             struct.pack('<q', self.chat_instance),
             b'' if self.data is None or self.data is False else (self.serialize_bytes(self.data)),
@@ -25609,7 +25984,7 @@ class UpdateInlineBotCallbackQuery(TLObject):
         flags = reader.read_int()
 
         _query_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _msg_id = reader.tgread_object()
         _chat_instance = reader.read_long()
         if flags & 1:
@@ -25629,7 +26004,7 @@ class UpdateLangPack(TLObject):
 
     def __init__(self, difference: 'TypeLangPackDifference'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.difference = difference
 
@@ -25657,7 +26032,7 @@ class UpdateLangPackTooLong(TLObject):
 
     def __init__(self, lang_code: str):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.lang_code = lang_code
 
@@ -25705,7 +26080,7 @@ class UpdateMessageID(TLObject):
     # noinspection PyShadowingBuiltins
     def __init__(self, id: int, random_id: int=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.id = id
         self.random_id = random_id if random_id is not None else int.from_bytes(os.urandom(8), 'big', signed=True)
@@ -25737,7 +26112,7 @@ class UpdateMessagePoll(TLObject):
 
     def __init__(self, poll_id: int, results: 'TypePollResults', poll: Optional['TypePoll']=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.poll_id = poll_id
         self.results = results
@@ -25774,12 +26149,12 @@ class UpdateMessagePoll(TLObject):
 
 
 class UpdateMessagePollVote(TLObject):
-    CONSTRUCTOR_ID = 0x37f69f0b
+    CONSTRUCTOR_ID = 0x106395c9
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, poll_id: int, user_id: int, options: List[bytes], qts: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.poll_id = poll_id
         self.user_id = user_id
@@ -25797,9 +26172,9 @@ class UpdateMessagePollVote(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x0b\x9f\xf67',
+            b'\xc9\x95c\x10',
             struct.pack('<q', self.poll_id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.options)),b''.join(self.serialize_bytes(x) for x in self.options),
             struct.pack('<i', self.qts),
         ))
@@ -25807,7 +26182,7 @@ class UpdateMessagePollVote(TLObject):
     @classmethod
     def from_reader(cls, reader):
         _poll_id = reader.read_long()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         reader.read_int()
         _options = []
         for _ in range(reader.read_int()):
@@ -25824,7 +26199,7 @@ class UpdateNewChannelMessage(TLObject):
 
     def __init__(self, message: 'TypeMessage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
         self.pts = pts
@@ -25860,7 +26235,7 @@ class UpdateNewEncryptedMessage(TLObject):
 
     def __init__(self, message: 'TypeEncryptedMessage', qts: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
         self.qts = qts
@@ -25892,7 +26267,7 @@ class UpdateNewMessage(TLObject):
 
     def __init__(self, message: 'TypeMessage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
         self.pts = pts
@@ -25928,7 +26303,7 @@ class UpdateNewScheduledMessage(TLObject):
 
     def __init__(self, message: 'TypeMessage'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.message = message
 
@@ -25956,7 +26331,7 @@ class UpdateNewStickerSet(TLObject):
 
     def __init__(self, stickerset: 'TypeStickerSet'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.stickerset = stickerset
 
@@ -25984,7 +26359,7 @@ class UpdateNotifySettings(TLObject):
 
     def __init__(self, peer: 'TypeNotifyPeer', notify_settings: 'TypePeerNotifySettings'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.notify_settings = notify_settings
@@ -26016,7 +26391,7 @@ class UpdatePeerBlocked(TLObject):
 
     def __init__(self, peer_id: 'TypePeer', blocked: bool):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer_id = peer_id
         self.blocked = blocked
@@ -26048,7 +26423,7 @@ class UpdatePeerHistoryTTL(TLObject):
 
     def __init__(self, peer: 'TypePeer', ttl_period: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.ttl_period = ttl_period
@@ -26086,7 +26461,7 @@ class UpdatePeerLocated(TLObject):
 
     def __init__(self, peers: List['TypePeerLocated']):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peers = peers
 
@@ -26119,7 +26494,7 @@ class UpdatePeerSettings(TLObject):
 
     def __init__(self, peer: 'TypePeer', settings: 'TypePeerSettings'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.settings = settings
@@ -26151,7 +26526,7 @@ class UpdatePhoneCall(TLObject):
 
     def __init__(self, phone_call: 'TypePhoneCall'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.phone_call = phone_call
 
@@ -26179,7 +26554,7 @@ class UpdatePhoneCallSignalingData(TLObject):
 
     def __init__(self, phone_call_id: int, data: bytes):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.phone_call_id = phone_call_id
         self.data = data
@@ -26206,12 +26581,12 @@ class UpdatePhoneCallSignalingData(TLObject):
 
 
 class UpdatePinnedChannelMessages(TLObject):
-    CONSTRUCTOR_ID = 0x8588878b
+    CONSTRUCTOR_ID = 0x5bb98608
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, messages: List[int], pts: int, pts_count: int, pinned: Optional[bool]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.messages = messages
@@ -26231,9 +26606,9 @@ class UpdatePinnedChannelMessages(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x8b\x87\x88\x85',
+            b'\x08\x86\xb9[',
             struct.pack('<I', (0 if self.pinned is None or self.pinned is False else 1)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.messages)),b''.join(struct.pack('<i', x) for x in self.messages),
             struct.pack('<i', self.pts),
             struct.pack('<i', self.pts_count),
@@ -26244,7 +26619,7 @@ class UpdatePinnedChannelMessages(TLObject):
         flags = reader.read_int()
 
         _pinned = bool(flags & 1)
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         reader.read_int()
         _messages = []
         for _ in range(reader.read_int()):
@@ -26262,7 +26637,7 @@ class UpdatePinnedDialogs(TLObject):
 
     def __init__(self, folder_id: Optional[int]=None, order: Optional[List['TypeDialogPeer']]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.folder_id = folder_id
         self.order = order
@@ -26308,7 +26683,7 @@ class UpdatePinnedMessages(TLObject):
 
     def __init__(self, peer: 'TypePeer', messages: List[int], pts: int, pts_count: int, pinned: Optional[bool]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.messages = messages
@@ -26359,7 +26734,7 @@ class UpdatePrivacy(TLObject):
 
     def __init__(self, key: 'TypePrivacyKey', rules: List['TypePrivacyRule']):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.key = key
         self.rules = rules
@@ -26410,12 +26785,12 @@ class UpdatePtsChanged(TLObject):
 
 
 class UpdateReadChannelDiscussionInbox(TLObject):
-    CONSTRUCTOR_ID = 0x1cc7de54
+    CONSTRUCTOR_ID = 0xd6b19546
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, top_msg_id: int, read_max_id: int, broadcast_id: Optional[int]=None, broadcast_post: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.top_msg_id = top_msg_id
@@ -26436,12 +26811,12 @@ class UpdateReadChannelDiscussionInbox(TLObject):
     def _bytes(self):
         assert ((self.broadcast_id or self.broadcast_id is not None) and (self.broadcast_post or self.broadcast_post is not None)) or ((self.broadcast_id is None or self.broadcast_id is False) and (self.broadcast_post is None or self.broadcast_post is False)), 'broadcast_id, broadcast_post parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'T\xde\xc7\x1c',
+            b'F\x95\xb1\xd6',
             struct.pack('<I', (0 if self.broadcast_id is None or self.broadcast_id is False else 1) | (0 if self.broadcast_post is None or self.broadcast_post is False else 1)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.top_msg_id),
             struct.pack('<i', self.read_max_id),
-            b'' if self.broadcast_id is None or self.broadcast_id is False else (struct.pack('<i', self.broadcast_id)),
+            b'' if self.broadcast_id is None or self.broadcast_id is False else (struct.pack('<q', self.broadcast_id)),
             b'' if self.broadcast_post is None or self.broadcast_post is False else (struct.pack('<i', self.broadcast_post)),
         ))
 
@@ -26449,11 +26824,11 @@ class UpdateReadChannelDiscussionInbox(TLObject):
     def from_reader(cls, reader):
         flags = reader.read_int()
 
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _top_msg_id = reader.read_int()
         _read_max_id = reader.read_int()
         if flags & 1:
-            _broadcast_id = reader.read_int()
+            _broadcast_id = reader.read_long()
         else:
             _broadcast_id = None
         if flags & 1:
@@ -26464,12 +26839,12 @@ class UpdateReadChannelDiscussionInbox(TLObject):
 
 
 class UpdateReadChannelDiscussionOutbox(TLObject):
-    CONSTRUCTOR_ID = 0x4638a26c
+    CONSTRUCTOR_ID = 0x695c9e7c
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, top_msg_id: int, read_max_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.top_msg_id = top_msg_id
@@ -26485,27 +26860,27 @@ class UpdateReadChannelDiscussionOutbox(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'l\xa28F',
-            struct.pack('<i', self.channel_id),
+            b'|\x9e\\i',
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.top_msg_id),
             struct.pack('<i', self.read_max_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _top_msg_id = reader.read_int()
         _read_max_id = reader.read_int()
         return cls(channel_id=_channel_id, top_msg_id=_top_msg_id, read_max_id=_read_max_id)
 
 
 class UpdateReadChannelInbox(TLObject):
-    CONSTRUCTOR_ID = 0x330b5424
+    CONSTRUCTOR_ID = 0x922e6e10
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, max_id: int, still_unread_count: int, pts: int, folder_id: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.max_id = max_id
@@ -26525,10 +26900,10 @@ class UpdateReadChannelInbox(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'$T\x0b3',
+            b'\x10n.\x92',
             struct.pack('<I', (0 if self.folder_id is None or self.folder_id is False else 1)),
             b'' if self.folder_id is None or self.folder_id is False else (struct.pack('<i', self.folder_id)),
-            struct.pack('<i', self.channel_id),
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.max_id),
             struct.pack('<i', self.still_unread_count),
             struct.pack('<i', self.pts),
@@ -26542,7 +26917,7 @@ class UpdateReadChannelInbox(TLObject):
             _folder_id = reader.read_int()
         else:
             _folder_id = None
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _max_id = reader.read_int()
         _still_unread_count = reader.read_int()
         _pts = reader.read_int()
@@ -26550,12 +26925,12 @@ class UpdateReadChannelInbox(TLObject):
 
 
 class UpdateReadChannelOutbox(TLObject):
-    CONSTRUCTOR_ID = 0x25d6c9c7
+    CONSTRUCTOR_ID = 0xb75f99a9
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, channel_id: int, max_id: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.channel_id = channel_id
         self.max_id = max_id
@@ -26569,14 +26944,14 @@ class UpdateReadChannelOutbox(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xc7\xc9\xd6%',
-            struct.pack('<i', self.channel_id),
+            b'\xa9\x99_\xb7',
+            struct.pack('<q', self.channel_id),
             struct.pack('<i', self.max_id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _channel_id = reader.read_int()
+        _channel_id = reader.read_long()
         _max_id = reader.read_int()
         return cls(channel_id=_channel_id, max_id=_max_id)
 
@@ -26606,7 +26981,7 @@ class UpdateReadHistoryInbox(TLObject):
 
     def __init__(self, peer: 'TypePeer', max_id: int, still_unread_count: int, pts: int, pts_count: int, folder_id: Optional[int]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.max_id = max_id
@@ -26660,7 +27035,7 @@ class UpdateReadHistoryOutbox(TLObject):
 
     def __init__(self, peer: 'TypePeer', max_id: int, pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.peer = peer
         self.max_id = max_id
@@ -26700,7 +27075,7 @@ class UpdateReadMessagesContents(TLObject):
 
     def __init__(self, messages: List[int], pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.messages = messages
         self.pts = pts
@@ -26780,7 +27155,7 @@ class UpdateServiceNotification(TLObject):
     # noinspection PyShadowingBuiltins
     def __init__(self, type: str, message: str, media: 'TypeMessageMedia', entities: List['TypeMessageEntity'], popup: Optional[bool]=None, inbox_date: Optional[datetime]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.type = type
         self.message = message
@@ -26865,7 +27240,7 @@ class UpdateShort(TLObject):
 
 
 class UpdateShortChatMessage(TLObject):
-    CONSTRUCTOR_ID = 0x1157b858
+    CONSTRUCTOR_ID = 0x4d6deea5
     SUBCLASS_OF_ID = 0x8af52aac
 
     # noinspection PyShadowingBuiltins
@@ -26913,17 +27288,17 @@ class UpdateShortChatMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'X\xb8W\x11',
+            b'\xa5\xeemM',
             struct.pack('<I', (0 if self.out is None or self.out is False else 2) | (0 if self.mentioned is None or self.mentioned is False else 16) | (0 if self.media_unread is None or self.media_unread is False else 32) | (0 if self.silent is None or self.silent is False else 8192) | (0 if self.fwd_from is None or self.fwd_from is False else 4) | (0 if self.via_bot_id is None or self.via_bot_id is False else 2048) | (0 if self.reply_to is None or self.reply_to is False else 8) | (0 if self.entities is None or self.entities is False else 128) | (0 if self.ttl_period is None or self.ttl_period is False else 33554432)),
             struct.pack('<i', self.id),
-            struct.pack('<i', self.from_id),
-            struct.pack('<i', self.chat_id),
+            struct.pack('<q', self.from_id),
+            struct.pack('<q', self.chat_id),
             self.serialize_bytes(self.message),
             struct.pack('<i', self.pts),
             struct.pack('<i', self.pts_count),
             self.serialize_datetime(self.date),
             b'' if self.fwd_from is None or self.fwd_from is False else (self.fwd_from._bytes()),
-            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<i', self.via_bot_id)),
+            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<q', self.via_bot_id)),
             b'' if self.reply_to is None or self.reply_to is False else (self.reply_to._bytes()),
             b'' if self.entities is None or self.entities is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.entities)),b''.join(x._bytes() for x in self.entities))),
             b'' if self.ttl_period is None or self.ttl_period is False else (struct.pack('<i', self.ttl_period)),
@@ -26938,8 +27313,8 @@ class UpdateShortChatMessage(TLObject):
         _media_unread = bool(flags & 32)
         _silent = bool(flags & 8192)
         _id = reader.read_int()
-        _from_id = reader.read_int()
-        _chat_id = reader.read_int()
+        _from_id = reader.read_long()
+        _chat_id = reader.read_long()
         _message = reader.tgread_string()
         _pts = reader.read_int()
         _pts_count = reader.read_int()
@@ -26949,7 +27324,7 @@ class UpdateShortChatMessage(TLObject):
         else:
             _fwd_from = None
         if flags & 2048:
-            _via_bot_id = reader.read_int()
+            _via_bot_id = reader.read_long()
         else:
             _via_bot_id = None
         if flags & 8:
@@ -26973,7 +27348,7 @@ class UpdateShortChatMessage(TLObject):
 
 
 class UpdateShortMessage(TLObject):
-    CONSTRUCTOR_ID = 0xfaeff833
+    CONSTRUCTOR_ID = 0x313bc7f8
     SUBCLASS_OF_ID = 0x8af52aac
 
     # noinspection PyShadowingBuiltins
@@ -27019,16 +27394,16 @@ class UpdateShortMessage(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'3\xf8\xef\xfa',
+            b'\xf8\xc7;1',
             struct.pack('<I', (0 if self.out is None or self.out is False else 2) | (0 if self.mentioned is None or self.mentioned is False else 16) | (0 if self.media_unread is None or self.media_unread is False else 32) | (0 if self.silent is None or self.silent is False else 8192) | (0 if self.fwd_from is None or self.fwd_from is False else 4) | (0 if self.via_bot_id is None or self.via_bot_id is False else 2048) | (0 if self.reply_to is None or self.reply_to is False else 8) | (0 if self.entities is None or self.entities is False else 128) | (0 if self.ttl_period is None or self.ttl_period is False else 33554432)),
             struct.pack('<i', self.id),
-            struct.pack('<I', self.user_id),
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.message),
             struct.pack('<i', self.pts),
             struct.pack('<i', self.pts_count),
             self.serialize_datetime(self.date),
             b'' if self.fwd_from is None or self.fwd_from is False else (self.fwd_from._bytes()),
-            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<i', self.via_bot_id)),
+            b'' if self.via_bot_id is None or self.via_bot_id is False else (struct.pack('<q', self.via_bot_id)),
             b'' if self.reply_to is None or self.reply_to is False else (self.reply_to._bytes()),
             b'' if self.entities is None or self.entities is False else b''.join((b'\x15\xc4\xb5\x1c',struct.pack('<i', len(self.entities)),b''.join(x._bytes() for x in self.entities))),
             b'' if self.ttl_period is None or self.ttl_period is False else (struct.pack('<i', self.ttl_period)),
@@ -27043,7 +27418,7 @@ class UpdateShortMessage(TLObject):
         _media_unread = bool(flags & 32)
         _silent = bool(flags & 8192)
         _id = reader.read_int()
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _message = reader.tgread_string()
         _pts = reader.read_int()
         _pts_count = reader.read_int()
@@ -27053,7 +27428,7 @@ class UpdateShortMessage(TLObject):
         else:
             _fwd_from = None
         if flags & 2048:
-            _via_bot_id = reader.read_int()
+            _via_bot_id = reader.read_long()
         else:
             _via_bot_id = None
         if flags & 8:
@@ -27174,7 +27549,7 @@ class UpdateStickerSetsOrder(TLObject):
 
     def __init__(self, order: List[int], masks: Optional[bool]=None):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.order = order
         self.masks = masks
@@ -27213,7 +27588,7 @@ class UpdateTheme(TLObject):
 
     def __init__(self, theme: 'TypeTheme'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.theme = theme
 
@@ -27236,12 +27611,12 @@ class UpdateTheme(TLObject):
 
 
 class UpdateUserName(TLObject):
-    CONSTRUCTOR_ID = 0xa7332b73
+    CONSTRUCTOR_ID = 0xc3f202e0
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, first_name: str, last_name: str, username: str):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.first_name = first_name
@@ -27259,8 +27634,8 @@ class UpdateUserName(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b's+3\xa7',
-            struct.pack('<I', self.user_id),
+            b'\xe0\x02\xf2\xc3',
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.first_name),
             self.serialize_bytes(self.last_name),
             self.serialize_bytes(self.username),
@@ -27268,7 +27643,7 @@ class UpdateUserName(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _first_name = reader.tgread_string()
         _last_name = reader.tgread_string()
         _username = reader.tgread_string()
@@ -27276,12 +27651,12 @@ class UpdateUserName(TLObject):
 
 
 class UpdateUserPhone(TLObject):
-    CONSTRUCTOR_ID = 0x12b9417b
+    CONSTRUCTOR_ID = 0x5492a13
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, phone: str):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.phone = phone
@@ -27295,25 +27670,25 @@ class UpdateUserPhone(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'{A\xb9\x12',
-            struct.pack('<I', self.user_id),
+            b'\x13*I\x05',
+            struct.pack('<q', self.user_id),
             self.serialize_bytes(self.phone),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _phone = reader.tgread_string()
         return cls(user_id=_user_id, phone=_phone)
 
 
 class UpdateUserPhoto(TLObject):
-    CONSTRUCTOR_ID = 0x95313b0c
+    CONSTRUCTOR_ID = 0xf227868c
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, date: Optional[datetime], photo: 'TypeUserProfilePhoto', previous: bool):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.date = date
@@ -27331,8 +27706,8 @@ class UpdateUserPhoto(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\x0c;1\x95',
-            struct.pack('<I', self.user_id),
+            b"\x8c\x86'\xf2",
+            struct.pack('<q', self.user_id),
             self.serialize_datetime(self.date),
             self.photo._bytes(),
             b'\xb5ur\x99' if self.previous else b'7\x97y\xbc',
@@ -27340,7 +27715,7 @@ class UpdateUserPhoto(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _date = reader.tgread_date()
         _photo = reader.tgread_object()
         _previous = reader.tgread_bool()
@@ -27348,12 +27723,12 @@ class UpdateUserPhoto(TLObject):
 
 
 class UpdateUserStatus(TLObject):
-    CONSTRUCTOR_ID = 0x1bfbd823
+    CONSTRUCTOR_ID = 0xe5bdf8de
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, status: 'TypeUserStatus'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.status = status
@@ -27367,25 +27742,25 @@ class UpdateUserStatus(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'#\xd8\xfb\x1b',
-            struct.pack('<I', self.user_id),
+            b'\xde\xf8\xbd\xe5',
+            struct.pack('<q', self.user_id),
             self.status._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _status = reader.tgread_object()
         return cls(user_id=_user_id, status=_status)
 
 
 class UpdateUserTyping(TLObject):
-    CONSTRUCTOR_ID = 0x5c486927
+    CONSTRUCTOR_ID = 0xc01e857f
     SUBCLASS_OF_ID = 0x9f89304e
 
     def __init__(self, user_id: int, action: 'TypeSendMessageAction'):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.user_id = user_id
         self.action = action
@@ -27399,14 +27774,14 @@ class UpdateUserTyping(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b"'iH\\",
-            struct.pack('<I', self.user_id),
+            b'\x7f\x85\x1e\xc0',
+            struct.pack('<q', self.user_id),
             self.action._bytes(),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _user_id = reader.read_int(signed=False)
+        _user_id = reader.read_long()
         _action = reader.tgread_object()
         return cls(user_id=_user_id, action=_action)
 
@@ -27417,7 +27792,7 @@ class UpdateWebPage(TLObject):
 
     def __init__(self, webpage: 'TypeWebPage', pts: int, pts_count: int):
         """
-        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection.
+        Constructor for Update: Instance of either UpdateNewMessage, UpdateMessageID, UpdateDeleteMessages, UpdateUserTyping, UpdateChatUserTyping, UpdateChatParticipants, UpdateUserStatus, UpdateUserName, UpdateUserPhoto, UpdateNewEncryptedMessage, UpdateEncryptedChatTyping, UpdateEncryption, UpdateEncryptedMessagesRead, UpdateChatParticipantAdd, UpdateChatParticipantDelete, UpdateDcOptions, UpdateNotifySettings, UpdateServiceNotification, UpdatePrivacy, UpdateUserPhone, UpdateReadHistoryInbox, UpdateReadHistoryOutbox, UpdateWebPage, UpdateReadMessagesContents, UpdateChannelTooLong, UpdateChannel, UpdateNewChannelMessage, UpdateReadChannelInbox, UpdateDeleteChannelMessages, UpdateChannelMessageViews, UpdateChatParticipantAdmin, UpdateNewStickerSet, UpdateStickerSetsOrder, UpdateStickerSets, UpdateSavedGifs, UpdateBotInlineQuery, UpdateBotInlineSend, UpdateEditChannelMessage, UpdateBotCallbackQuery, UpdateEditMessage, UpdateInlineBotCallbackQuery, UpdateReadChannelOutbox, UpdateDraftMessage, UpdateReadFeaturedStickers, UpdateRecentStickers, UpdateConfig, UpdatePtsChanged, UpdateChannelWebPage, UpdateDialogPinned, UpdatePinnedDialogs, UpdateBotWebhookJSON, UpdateBotWebhookJSONQuery, UpdateBotShippingQuery, UpdateBotPrecheckoutQuery, UpdatePhoneCall, UpdateLangPackTooLong, UpdateLangPack, UpdateFavedStickers, UpdateChannelReadMessagesContents, UpdateContactsReset, UpdateChannelAvailableMessages, UpdateDialogUnreadMark, UpdateMessagePoll, UpdateChatDefaultBannedRights, UpdateFolderPeers, UpdatePeerSettings, UpdatePeerLocated, UpdateNewScheduledMessage, UpdateDeleteScheduledMessages, UpdateTheme, UpdateGeoLiveViewed, UpdateLoginToken, UpdateMessagePollVote, UpdateDialogFilter, UpdateDialogFilterOrder, UpdateDialogFilters, UpdatePhoneCallSignalingData, UpdateChannelMessageForwards, UpdateReadChannelDiscussionInbox, UpdateReadChannelDiscussionOutbox, UpdatePeerBlocked, UpdateChannelUserTyping, UpdatePinnedMessages, UpdatePinnedChannelMessages, UpdateChat, UpdateGroupCallParticipants, UpdateGroupCall, UpdatePeerHistoryTTL, UpdateChatParticipant, UpdateChannelParticipant, UpdateBotStopped, UpdateGroupCallConnection, UpdateBotCommands.
         """
         self.webpage = webpage
         self.pts = pts
@@ -27674,7 +28049,7 @@ class UrlAuthResultRequest(TLObject):
 
 
 class User(TLObject):
-    CONSTRUCTOR_ID = 0x938458c1
+    CONSTRUCTOR_ID = 0x3ff6ecb0
     SUBCLASS_OF_ID = 0x2da17977
 
     # noinspection PyShadowingBuiltins
@@ -27746,9 +28121,9 @@ class User(TLObject):
         assert ((self.bot or self.bot is not None) and (self.bot_info_version or self.bot_info_version is not None)) or ((self.bot is None or self.bot is False) and (self.bot_info_version is None or self.bot_info_version is False)), 'bot, bot_info_version parameters must all be False-y (like None) or all me True-y'
         assert ((self.restricted or self.restricted is not None) and (self.restriction_reason or self.restriction_reason is not None)) or ((self.restricted is None or self.restricted is False) and (self.restriction_reason is None or self.restriction_reason is False)), 'restricted, restriction_reason parameters must all be False-y (like None) or all me True-y'
         return b''.join((
-            b'\xc1X\x84\x93',
+            b'\xb0\xec\xf6?',
             struct.pack('<I', (0 if self.is_self is None or self.is_self is False else 1024) | (0 if self.contact is None or self.contact is False else 2048) | (0 if self.mutual_contact is None or self.mutual_contact is False else 4096) | (0 if self.deleted is None or self.deleted is False else 8192) | (0 if self.bot is None or self.bot is False else 16384) | (0 if self.bot_chat_history is None or self.bot_chat_history is False else 32768) | (0 if self.bot_nochats is None or self.bot_nochats is False else 65536) | (0 if self.verified is None or self.verified is False else 131072) | (0 if self.restricted is None or self.restricted is False else 262144) | (0 if self.min is None or self.min is False else 1048576) | (0 if self.bot_inline_geo is None or self.bot_inline_geo is False else 2097152) | (0 if self.support is None or self.support is False else 8388608) | (0 if self.scam is None or self.scam is False else 16777216) | (0 if self.apply_min_photo is None or self.apply_min_photo is False else 33554432) | (0 if self.fake is None or self.fake is False else 67108864) | (0 if self.access_hash is None or self.access_hash is False else 1) | (0 if self.first_name is None or self.first_name is False else 2) | (0 if self.last_name is None or self.last_name is False else 4) | (0 if self.username is None or self.username is False else 8) | (0 if self.phone is None or self.phone is False else 16) | (0 if self.photo is None or self.photo is False else 32) | (0 if self.status is None or self.status is False else 64) | (0 if self.bot_info_version is None or self.bot_info_version is False else 16384) | (0 if self.restriction_reason is None or self.restriction_reason is False else 262144) | (0 if self.bot_inline_placeholder is None or self.bot_inline_placeholder is False else 524288) | (0 if self.lang_code is None or self.lang_code is False else 4194304)),
-            struct.pack('<I', self.id),
+            struct.pack('<q', self.id),
             b'' if self.access_hash is None or self.access_hash is False else (struct.pack('<q', self.access_hash)),
             b'' if self.first_name is None or self.first_name is False else (self.serialize_bytes(self.first_name)),
             b'' if self.last_name is None or self.last_name is False else (self.serialize_bytes(self.last_name)),
@@ -27781,7 +28156,7 @@ class User(TLObject):
         _scam = bool(flags & 16777216)
         _apply_min_photo = bool(flags & 33554432)
         _fake = bool(flags & 67108864)
-        _id = reader.read_int(signed=False)
+        _id = reader.read_long()
         if flags & 1:
             _access_hash = reader.read_long()
         else:
@@ -27835,7 +28210,7 @@ class User(TLObject):
 
 
 class UserEmpty(TLObject):
-    CONSTRUCTOR_ID = 0x200250ba
+    CONSTRUCTOR_ID = 0xd3bc4b7a
     SUBCLASS_OF_ID = 0x2da17977
 
     # noinspection PyShadowingBuiltins
@@ -27853,21 +28228,21 @@ class UserEmpty(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xbaP\x02 ',
-            struct.pack('<I', self.id),
+            b'zK\xbc\xd3',
+            struct.pack('<q', self.id),
         ))
 
     @classmethod
     def from_reader(cls, reader):
-        _id = reader.read_int(signed=False)
+        _id = reader.read_long()
         return cls(id=_id)
 
 
 class UserFull(TLObject):
-    CONSTRUCTOR_ID = 0x139a9a77
+    CONSTRUCTOR_ID = 0xd697ff05
     SUBCLASS_OF_ID = 0x1f4661b9
 
-    def __init__(self, user: 'TypeUser', settings: 'TypePeerSettings', notify_settings: 'TypePeerNotifySettings', common_chats_count: int, blocked: Optional[bool]=None, phone_calls_available: Optional[bool]=None, phone_calls_private: Optional[bool]=None, can_pin_message: Optional[bool]=None, has_scheduled: Optional[bool]=None, video_calls_available: Optional[bool]=None, about: Optional[str]=None, profile_photo: Optional['TypePhoto']=None, bot_info: Optional['TypeBotInfo']=None, pinned_msg_id: Optional[int]=None, folder_id: Optional[int]=None, ttl_period: Optional[int]=None):
+    def __init__(self, user: 'TypeUser', settings: 'TypePeerSettings', notify_settings: 'TypePeerNotifySettings', common_chats_count: int, blocked: Optional[bool]=None, phone_calls_available: Optional[bool]=None, phone_calls_private: Optional[bool]=None, can_pin_message: Optional[bool]=None, has_scheduled: Optional[bool]=None, video_calls_available: Optional[bool]=None, about: Optional[str]=None, profile_photo: Optional['TypePhoto']=None, bot_info: Optional['TypeBotInfo']=None, pinned_msg_id: Optional[int]=None, folder_id: Optional[int]=None, ttl_period: Optional[int]=None, theme_emoticon: Optional[str]=None):
         """
         Constructor for UserFull: Instance of UserFull.
         """
@@ -27887,6 +28262,7 @@ class UserFull(TLObject):
         self.pinned_msg_id = pinned_msg_id
         self.folder_id = folder_id
         self.ttl_period = ttl_period
+        self.theme_emoticon = theme_emoticon
 
     def to_dict(self):
         return {
@@ -27906,13 +28282,14 @@ class UserFull(TLObject):
             'bot_info': self.bot_info.to_dict() if isinstance(self.bot_info, TLObject) else self.bot_info,
             'pinned_msg_id': self.pinned_msg_id,
             'folder_id': self.folder_id,
-            'ttl_period': self.ttl_period
+            'ttl_period': self.ttl_period,
+            'theme_emoticon': self.theme_emoticon
         }
 
     def _bytes(self):
         return b''.join((
-            b'w\x9a\x9a\x13',
-            struct.pack('<I', (0 if self.blocked is None or self.blocked is False else 1) | (0 if self.phone_calls_available is None or self.phone_calls_available is False else 16) | (0 if self.phone_calls_private is None or self.phone_calls_private is False else 32) | (0 if self.can_pin_message is None or self.can_pin_message is False else 128) | (0 if self.has_scheduled is None or self.has_scheduled is False else 4096) | (0 if self.video_calls_available is None or self.video_calls_available is False else 8192) | (0 if self.about is None or self.about is False else 2) | (0 if self.profile_photo is None or self.profile_photo is False else 4) | (0 if self.bot_info is None or self.bot_info is False else 8) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 64) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.ttl_period is None or self.ttl_period is False else 16384)),
+            b'\x05\xff\x97\xd6',
+            struct.pack('<I', (0 if self.blocked is None or self.blocked is False else 1) | (0 if self.phone_calls_available is None or self.phone_calls_available is False else 16) | (0 if self.phone_calls_private is None or self.phone_calls_private is False else 32) | (0 if self.can_pin_message is None or self.can_pin_message is False else 128) | (0 if self.has_scheduled is None or self.has_scheduled is False else 4096) | (0 if self.video_calls_available is None or self.video_calls_available is False else 8192) | (0 if self.about is None or self.about is False else 2) | (0 if self.profile_photo is None or self.profile_photo is False else 4) | (0 if self.bot_info is None or self.bot_info is False else 8) | (0 if self.pinned_msg_id is None or self.pinned_msg_id is False else 64) | (0 if self.folder_id is None or self.folder_id is False else 2048) | (0 if self.ttl_period is None or self.ttl_period is False else 16384) | (0 if self.theme_emoticon is None or self.theme_emoticon is False else 32768)),
             self.user._bytes(),
             b'' if self.about is None or self.about is False else (self.serialize_bytes(self.about)),
             self.settings._bytes(),
@@ -27923,6 +28300,7 @@ class UserFull(TLObject):
             struct.pack('<i', self.common_chats_count),
             b'' if self.folder_id is None or self.folder_id is False else (struct.pack('<i', self.folder_id)),
             b'' if self.ttl_period is None or self.ttl_period is False else (struct.pack('<i', self.ttl_period)),
+            b'' if self.theme_emoticon is None or self.theme_emoticon is False else (self.serialize_bytes(self.theme_emoticon)),
         ))
 
     @classmethod
@@ -27963,7 +28341,11 @@ class UserFull(TLObject):
             _ttl_period = reader.read_int()
         else:
             _ttl_period = None
-        return cls(user=_user, settings=_settings, notify_settings=_notify_settings, common_chats_count=_common_chats_count, blocked=_blocked, phone_calls_available=_phone_calls_available, phone_calls_private=_phone_calls_private, can_pin_message=_can_pin_message, has_scheduled=_has_scheduled, video_calls_available=_video_calls_available, about=_about, profile_photo=_profile_photo, bot_info=_bot_info, pinned_msg_id=_pinned_msg_id, folder_id=_folder_id, ttl_period=_ttl_period)
+        if flags & 32768:
+            _theme_emoticon = reader.tgread_string()
+        else:
+            _theme_emoticon = None
+        return cls(user=_user, settings=_settings, notify_settings=_notify_settings, common_chats_count=_common_chats_count, blocked=_blocked, phone_calls_available=_phone_calls_available, phone_calls_private=_phone_calls_private, can_pin_message=_can_pin_message, has_scheduled=_has_scheduled, video_calls_available=_video_calls_available, about=_about, profile_photo=_profile_photo, bot_info=_bot_info, pinned_msg_id=_pinned_msg_id, folder_id=_folder_id, ttl_period=_ttl_period, theme_emoticon=_theme_emoticon)
 
 
 class UserProfilePhoto(TLObject):
@@ -28398,7 +28780,7 @@ class WallPaperSettings(TLObject):
 
 
 class WebAuthorization(TLObject):
-    CONSTRUCTOR_ID = 0xcac943f2
+    CONSTRUCTOR_ID = 0xa6f8f452
     SUBCLASS_OF_ID = 0x3764d30
 
     # noinspection PyShadowingBuiltins
@@ -28432,9 +28814,9 @@ class WebAuthorization(TLObject):
 
     def _bytes(self):
         return b''.join((
-            b'\xf2C\xc9\xca',
+            b'R\xf4\xf8\xa6',
             struct.pack('<q', self.hash),
-            struct.pack('<i', self.bot_id),
+            struct.pack('<q', self.bot_id),
             self.serialize_bytes(self.domain),
             self.serialize_bytes(self.browser),
             self.serialize_bytes(self.platform),
@@ -28447,7 +28829,7 @@ class WebAuthorization(TLObject):
     @classmethod
     def from_reader(cls, reader):
         _hash = reader.read_long()
-        _bot_id = reader.read_int()
+        _bot_id = reader.read_long()
         _domain = reader.tgread_string()
         _browser = reader.tgread_string()
         _platform = reader.tgread_string()
@@ -28876,6 +29258,7 @@ TypeChatOnlines = ChatOnlines
 TypeChatParticipant = Union[ChatParticipant,ChatParticipantCreator,ChatParticipantAdmin]
 TypeChatParticipants = Union[ChatParticipantsForbidden,ChatParticipants]
 TypeChatPhoto = Union[ChatPhotoEmpty,ChatPhoto]
+TypeChatTheme = ChatTheme
 TypeClient_DH_Inner_Data = ClientDHInnerData
 TypeCodeSettings = CodeSettings
 TypeConfig = Config
@@ -28920,7 +29303,7 @@ TypeInlineBotSwitchPM = InlineBotSwitchPM
 TypeInlineQueryPeerType = Union[InlineQueryPeerTypeSameBotPM,InlineQueryPeerTypePM,InlineQueryPeerTypeChat,InlineQueryPeerTypeMegagroup,InlineQueryPeerTypeBroadcast]
 TypeInputAppEvent = InputAppEvent
 TypeInputBotInlineMessage = Union[InputBotInlineMessageMediaAuto,InputBotInlineMessageText,InputBotInlineMessageMediaGeo,InputBotInlineMessageMediaVenue,InputBotInlineMessageMediaContact,InputBotInlineMessageGame,InputBotInlineMessageMediaInvoice]
-TypeInputBotInlineMessageID = InputBotInlineMessageID
+TypeInputBotInlineMessageID = Union[InputBotInlineMessageID,InputBotInlineMessageID64]
 TypeInputBotInlineResult = Union[InputBotInlineResult,InputBotInlineResultPhoto,InputBotInlineResultDocument,InputBotInlineResultGame]
 TypeInputChannel = Union[InputChannelEmpty,InputChannel,InputChannelFromMessage]
 TypeInputChatPhoto = Union[InputChatPhotoEmpty,InputChatUploadedPhoto,InputChatPhoto]
@@ -28954,7 +29337,7 @@ TypeReportReason = Union[InputReportReasonSpam,InputReportReasonViolence,InputRe
 TypeInputSecureFile = Union[InputSecureFileUploaded,InputSecureFile]
 TypeInputSecureValue = InputSecureValue
 TypeInputSingleMedia = InputSingleMedia
-TypeInputStickerSet = Union[InputStickerSetEmpty,InputStickerSetID,InputStickerSetShortName,InputStickerSetAnimatedEmoji,InputStickerSetDice]
+TypeInputStickerSet = Union[InputStickerSetEmpty,InputStickerSetID,InputStickerSetShortName,InputStickerSetAnimatedEmoji,InputStickerSetDice,InputStickerSetAnimatedEmojiAnimations]
 TypeInputStickerSetItem = InputStickerSetItem
 TypeInputStickeredMedia = Union[InputStickeredMediaPhoto,InputStickeredMediaDocument]
 TypeInputTheme = Union[InputTheme,InputThemeSlug]
@@ -28974,7 +29357,7 @@ TypeLangPackLanguage = LangPackLanguage
 TypeLangPackString = Union[LangPackString,LangPackStringPluralized,LangPackStringDeleted]
 TypeMaskCoords = MaskCoords
 TypeMessage = Union[MessageEmpty,Message,MessageService]
-TypeMessageAction = Union[MessageActionEmpty,MessageActionChatCreate,MessageActionChatEditTitle,MessageActionChatEditPhoto,MessageActionChatDeletePhoto,MessageActionChatAddUser,MessageActionChatDeleteUser,MessageActionChatJoinedByLink,MessageActionChannelCreate,MessageActionChatMigrateTo,MessageActionChannelMigrateFrom,MessageActionPinMessage,MessageActionHistoryClear,MessageActionGameScore,MessageActionPaymentSentMe,MessageActionPaymentSent,MessageActionPhoneCall,MessageActionScreenshotTaken,MessageActionCustomAction,MessageActionBotAllowed,MessageActionSecureValuesSentMe,MessageActionSecureValuesSent,MessageActionContactSignUp,MessageActionGeoProximityReached,MessageActionGroupCall,MessageActionInviteToGroupCall,MessageActionSetMessagesTTL,MessageActionGroupCallScheduled]
+TypeMessageAction = Union[MessageActionEmpty,MessageActionChatCreate,MessageActionChatEditTitle,MessageActionChatEditPhoto,MessageActionChatDeletePhoto,MessageActionChatAddUser,MessageActionChatDeleteUser,MessageActionChatJoinedByLink,MessageActionChannelCreate,MessageActionChatMigrateTo,MessageActionChannelMigrateFrom,MessageActionPinMessage,MessageActionHistoryClear,MessageActionGameScore,MessageActionPaymentSentMe,MessageActionPaymentSent,MessageActionPhoneCall,MessageActionScreenshotTaken,MessageActionCustomAction,MessageActionBotAllowed,MessageActionSecureValuesSentMe,MessageActionSecureValuesSent,MessageActionContactSignUp,MessageActionGeoProximityReached,MessageActionGroupCall,MessageActionInviteToGroupCall,MessageActionSetMessagesTTL,MessageActionGroupCallScheduled,MessageActionSetChatTheme]
 TypeMessageFwdHeader = MessageFwdHeader
 TypeMessageInteractionCounters = MessageInteractionCounters
 TypeMessageMedia = Union[MessageMediaEmpty,MessageMediaPhoto,MessageMediaGeo,MessageMediaContact,MessageMediaUnsupported,MessageMediaDocument,MessageMediaWebPage,MessageMediaVenue,MessageMediaGame,MessageMediaInvoice,MessageMediaGeoLive,MessageMediaPoll,MessageMediaDice]
@@ -29044,10 +29427,11 @@ TypeSecureValue = SecureValue
 TypeSecureValueError = Union[SecureValueErrorData,SecureValueErrorFrontSide,SecureValueErrorReverseSide,SecureValueErrorSelfie,SecureValueErrorFile,SecureValueErrorFiles,SecureValueError,SecureValueErrorTranslationFile,SecureValueErrorTranslationFiles]
 TypeSecureValueHash = SecureValueHash
 TypeSecureValueType = Union[SecureValueTypePersonalDetails,SecureValueTypePassport,SecureValueTypeDriverLicense,SecureValueTypeIdentityCard,SecureValueTypeInternalPassport,SecureValueTypeAddress,SecureValueTypeUtilityBill,SecureValueTypeBankStatement,SecureValueTypeRentalAgreement,SecureValueTypePassportRegistration,SecureValueTypeTemporaryRegistration,SecureValueTypePhone,SecureValueTypeEmail]
-TypeSendMessageAction = Union[SendMessageTypingAction,SendMessageCancelAction,SendMessageRecordVideoAction,SendMessageUploadVideoAction,SendMessageRecordAudioAction,SendMessageUploadAudioAction,SendMessageUploadPhotoAction,SendMessageUploadDocumentAction,SendMessageGeoLocationAction,SendMessageChooseContactAction,SendMessageGamePlayAction,SendMessageRecordRoundAction,SendMessageUploadRoundAction,SpeakingInGroupCallAction,SendMessageHistoryImportAction]
+TypeSendMessageAction = Union[SendMessageTypingAction,SendMessageCancelAction,SendMessageRecordVideoAction,SendMessageUploadVideoAction,SendMessageRecordAudioAction,SendMessageUploadAudioAction,SendMessageUploadPhotoAction,SendMessageUploadDocumentAction,SendMessageGeoLocationAction,SendMessageChooseContactAction,SendMessageGamePlayAction,SendMessageRecordRoundAction,SendMessageUploadRoundAction,SpeakingInGroupCallAction,SendMessageHistoryImportAction,SendMessageChooseStickerAction,SendMessageEmojiInteraction,SendMessageEmojiInteractionSeen]
 TypeServer_DH_inner_data = ServerDHInnerData
 TypeServer_DH_Params = Union[ServerDHParamsFail,ServerDHParamsOk]
 TypeShippingOption = ShippingOption
+TypeSponsoredMessage = SponsoredMessage
 TypeStatsAbsValueAndPrev = StatsAbsValueAndPrev
 TypeStatsDateRangeDays = StatsDateRangeDays
 TypeStatsGraph = Union[StatsGraphAsync,StatsGraphError,StatsGraph]
@@ -29067,7 +29451,7 @@ TypeTlsClientHello = TlsClientHello
 TypeTopPeer = TopPeer
 TypeTopPeerCategory = Union[TopPeerCategoryBotsPM,TopPeerCategoryBotsInline,TopPeerCategoryCorrespondents,TopPeerCategoryGroups,TopPeerCategoryChannels,TopPeerCategoryPhoneCalls,TopPeerCategoryForwardUsers,TopPeerCategoryForwardChats]
 TypeTopPeerCategoryPeers = TopPeerCategoryPeers
-TypeUpdate = Union[UpdateNewMessage,UpdateMessageID,UpdateDeleteMessages,UpdateUserTyping,UpdateChatUserTyping,UpdateChatParticipants,UpdateUserStatus,UpdateUserName,UpdateUserPhoto,UpdateNewEncryptedMessage,UpdateEncryptedChatTyping,UpdateEncryption,UpdateEncryptedMessagesRead,UpdateChatParticipantAdd,UpdateChatParticipantDelete,UpdateDcOptions,UpdateNotifySettings,UpdateServiceNotification,UpdatePrivacy,UpdateUserPhone,UpdateReadHistoryInbox,UpdateReadHistoryOutbox,UpdateWebPage,UpdateReadMessagesContents,UpdateChannelTooLong,UpdateChannel,UpdateNewChannelMessage,UpdateReadChannelInbox,UpdateDeleteChannelMessages,UpdateChannelMessageViews,UpdateChatParticipantAdmin,UpdateNewStickerSet,UpdateStickerSetsOrder,UpdateStickerSets,UpdateSavedGifs,UpdateBotInlineQuery,UpdateBotInlineSend,UpdateEditChannelMessage,UpdateBotCallbackQuery,UpdateEditMessage,UpdateInlineBotCallbackQuery,UpdateReadChannelOutbox,UpdateDraftMessage,UpdateReadFeaturedStickers,UpdateRecentStickers,UpdateConfig,UpdatePtsChanged,UpdateChannelWebPage,UpdateDialogPinned,UpdatePinnedDialogs,UpdateBotWebhookJSON,UpdateBotWebhookJSONQuery,UpdateBotShippingQuery,UpdateBotPrecheckoutQuery,UpdatePhoneCall,UpdateLangPackTooLong,UpdateLangPack,UpdateFavedStickers,UpdateChannelReadMessagesContents,UpdateContactsReset,UpdateChannelAvailableMessages,UpdateDialogUnreadMark,UpdateMessagePoll,UpdateChatDefaultBannedRights,UpdateFolderPeers,UpdatePeerSettings,UpdatePeerLocated,UpdateNewScheduledMessage,UpdateDeleteScheduledMessages,UpdateTheme,UpdateGeoLiveViewed,UpdateLoginToken,UpdateMessagePollVote,UpdateDialogFilter,UpdateDialogFilterOrder,UpdateDialogFilters,UpdatePhoneCallSignalingData,UpdateChannelMessageForwards,UpdateReadChannelDiscussionInbox,UpdateReadChannelDiscussionOutbox,UpdatePeerBlocked,UpdateChannelUserTyping,UpdatePinnedMessages,UpdatePinnedChannelMessages,UpdateChat,UpdateGroupCallParticipants,UpdateGroupCall,UpdatePeerHistoryTTL,UpdateChatParticipant,UpdateChannelParticipant,UpdateBotStopped,UpdateGroupCallConnection]
+TypeUpdate = Union[UpdateNewMessage,UpdateMessageID,UpdateDeleteMessages,UpdateUserTyping,UpdateChatUserTyping,UpdateChatParticipants,UpdateUserStatus,UpdateUserName,UpdateUserPhoto,UpdateNewEncryptedMessage,UpdateEncryptedChatTyping,UpdateEncryption,UpdateEncryptedMessagesRead,UpdateChatParticipantAdd,UpdateChatParticipantDelete,UpdateDcOptions,UpdateNotifySettings,UpdateServiceNotification,UpdatePrivacy,UpdateUserPhone,UpdateReadHistoryInbox,UpdateReadHistoryOutbox,UpdateWebPage,UpdateReadMessagesContents,UpdateChannelTooLong,UpdateChannel,UpdateNewChannelMessage,UpdateReadChannelInbox,UpdateDeleteChannelMessages,UpdateChannelMessageViews,UpdateChatParticipantAdmin,UpdateNewStickerSet,UpdateStickerSetsOrder,UpdateStickerSets,UpdateSavedGifs,UpdateBotInlineQuery,UpdateBotInlineSend,UpdateEditChannelMessage,UpdateBotCallbackQuery,UpdateEditMessage,UpdateInlineBotCallbackQuery,UpdateReadChannelOutbox,UpdateDraftMessage,UpdateReadFeaturedStickers,UpdateRecentStickers,UpdateConfig,UpdatePtsChanged,UpdateChannelWebPage,UpdateDialogPinned,UpdatePinnedDialogs,UpdateBotWebhookJSON,UpdateBotWebhookJSONQuery,UpdateBotShippingQuery,UpdateBotPrecheckoutQuery,UpdatePhoneCall,UpdateLangPackTooLong,UpdateLangPack,UpdateFavedStickers,UpdateChannelReadMessagesContents,UpdateContactsReset,UpdateChannelAvailableMessages,UpdateDialogUnreadMark,UpdateMessagePoll,UpdateChatDefaultBannedRights,UpdateFolderPeers,UpdatePeerSettings,UpdatePeerLocated,UpdateNewScheduledMessage,UpdateDeleteScheduledMessages,UpdateTheme,UpdateGeoLiveViewed,UpdateLoginToken,UpdateMessagePollVote,UpdateDialogFilter,UpdateDialogFilterOrder,UpdateDialogFilters,UpdatePhoneCallSignalingData,UpdateChannelMessageForwards,UpdateReadChannelDiscussionInbox,UpdateReadChannelDiscussionOutbox,UpdatePeerBlocked,UpdateChannelUserTyping,UpdatePinnedMessages,UpdatePinnedChannelMessages,UpdateChat,UpdateGroupCallParticipants,UpdateGroupCall,UpdatePeerHistoryTTL,UpdateChatParticipant,UpdateChannelParticipant,UpdateBotStopped,UpdateGroupCallConnection,UpdateBotCommands]
 TypeUpdates = Union[UpdatesTooLong,UpdateShortMessage,UpdateShortChatMessage,UpdateShort,UpdatesCombined,Updates,UpdateShortSentMessage]
 TypeUrlAuthResult = Union[UrlAuthResultRequest,UrlAuthResultAccepted,UrlAuthResultDefault]
 TypeUser = Union[UserEmpty,User]
