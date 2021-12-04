@@ -12,9 +12,9 @@ from telethon.tl.types import (
 PeerChannel
 )
 import datetime
-import parser_rsa_rf
-import parser_rsamonitor
-import parser_egarant_limiti
+from parser_rsa_rf import parser_rsa_rf
+from parser_rsamonitor import parser_rsamonitor
+from parser_egarant_limiti import parser_egarant_limiti
 
 
 api_id = "5086045"
