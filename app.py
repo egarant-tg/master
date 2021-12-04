@@ -12,9 +12,9 @@ from telethon.tl.types import (
 PeerChannel
 )
 import datetime
-from parser_rsa_rf import parser_rsa_rf
-from parser_rsamonitor import parser_rsamonitor
-from parser_egarant_limiti import parser_egarant_limiti
+from parser_rsa_rf import parse_rsa_rf
+from parser_rsamonitor import parse_rsamonitor
+from parser_egarant_limiti import parse_egarant_limiti
 
 
 api_id = "5086045"
@@ -37,9 +37,9 @@ async def my_event_handler(event):
     #разбиваем сообщение по строкам
     text=event.message.message.split("\n")
     print("reading message")
-    parser_rsa_rf(text)
-    parser_rsamonitor(text)
-    parser_egarantl_limiti(text)
+    parse_rsa_rf(text)
+    parse_rsamonitor(text)
+    parse_egarantl_limiti(text)
 
 with client:
     client.run_until_disconnected()
