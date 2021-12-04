@@ -5,6 +5,7 @@
 
 import configparser
 import json
+import asyncio
 from telethon import TelegramClient, events
 from telethon.errors import SessionPasswordNeededError
 from telethon.tl.functions.messages import (GetHistoryRequest)
@@ -37,9 +38,9 @@ async def my_event_handler(event):
     #разбиваем сообщение по строкам
     text=event.message.message.split("\n")
     print("reading message")
-    parse_rsa_rf(text)
-    parse_rsamonitor(text)
-    parse_egarant_limiti(text)
+    asyncio.run(parse_rsa_rf(text))
+    asyncio.run(parse_rsamonitor(text))
+    asyncio.run(parse_egarant_limiti(text))
 
 with client:
     client.run_until_disconnected()
