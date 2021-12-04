@@ -18,6 +18,6 @@ async def parse_rsamonitor(text, client, alarm_receiver):
             #ищем в ней цифры
             line_with_sk = line.split()
             for n in line_with_sk:
-                if n.isdigit() and int(n)<=200:
-                    print("СК 'БАСК' меньше 200")
-                    await client.send_message(alarm_receiver, "СК 'БАСК' меньше 200")
+                if n.isdigit() and int(n)<=250:
+                    print("СК 'БАСК' меньше 250")
+                    await client.send_message(alarm_receiver, "СК 'БАСК' меньше 250")
