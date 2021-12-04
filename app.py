@@ -39,7 +39,7 @@ async def my_event_handler(event):
     print("reading message")
     parse_rsa_rf(text)
     parse_rsamonitor(text)
-    parse_egarantl_limiti(text)
+    parse_egarant_limiti(text)
 
 with client:
     client.run_until_disconnected()
