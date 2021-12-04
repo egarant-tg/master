@@ -1,4 +1,4 @@
-def parse_rsa_rf(text):
+async def parse_rsa_rf(text):
     for line in text:
         #ищем нужную строку
         if "Количество СК в РСА: " in line: #настройки для "rsa_rf"
