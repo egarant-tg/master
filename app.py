@@ -12,6 +12,10 @@ from telethon.tl.types import (
 PeerChannel
 )
 import datetime
+import parser_rsa_rf
+import parser_rsamonitor
+import parser_egarant_limiti
+
 
 api_id = "5086045"
 api_hash = "e0bcc2b6aba38988f6675767aee63591"
@@ -33,50 +37,9 @@ async def my_event_handler(event):
     #разбиваем сообщение по строкам
     text=event.message.message.split("\n")
     print("reading message")
-    for line in text:
-        #ищем нужную строку
-        if "Количество СК в РСА: " in line: #настройки для "rsa_rf"
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)>20:
-                    print("Количество СК меньше или равно двум, отправляю сообщение...")
-                    await client.send_message(alarm_receiver, "Возможно квота. На Е-Гаранте больше 20 СК!")
-        elif "Согласие:" in line:
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)>2:
-                    print("СК 'Согласие' есть на Е-Гаранте")
-                    await client.send_message(alarm_receiver, "СК 'Согласие' больше 3")
-        elif "БАСК:" in line:
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)<=200:
-                    print("СК 'БАСК' меньше 200")
-                    await client.send_message(alarm_receiver, "СК 'БАСК' меньше 200")
-        elif "Количество компаний в РСА: " in line: #настройки для "rsamonitor"
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)>20:
-                    print("Количество СК меньше или равно двум, отправляю сообщение...")
-                    await client.send_message(alarm_receiver, "Возможно квота. На Е-Гаранте больше 20 СК!")
-        elif "Согласие" in line:
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)>2:
-                    print("СК 'Согласие' есть на Е-Гаранте")
-                    await client.send_message(alarm_receiver, "СК 'Согласие' больше 3")
-        elif "БАСК" in line:
-            #ищем в ней цифры
-            line_with_sk = line.split()
-            for n in line_with_sk:
-                if n.isdigit() and int(n)<=200:
-                    print("СК 'БАСК' меньше 200")
-                    await client.send_message(alarm_receiver, "СК 'БАСК' меньше 200")
+    parser_rsa_rf(text)
+    parser_rsamonitor(text)
+    parser_egarantl_limiti(text)
 
 with client:
     client.run_until_disconnected()
