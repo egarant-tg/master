@@ -38,9 +38,9 @@ async def my_event_handler(event):
     #разбиваем сообщение по строкам
     text=event.message.message.split("\n")
     print("reading message")
-    await parse_rsa_rf(text)
-    await parse_rsamonitor(text)
-    await parse_egarant_limiti(text)
+    await parse_rsa_rf(text, client, alarm_receiver)
+    await parse_rsamonitor(text, client, alarm_receiver)
+    await parse_egarant_limiti(text, client, alarm_receiver)
 
 with client:
     client.run_until_disconnected()

@@ -1,4 +1,4 @@
-async def parse_rsamonitor(text):
+async def parse_rsamonitor(text, client, alarm_receiver):
     for line in text:
         if "Количество компаний в РСА: " in line: #настройки для "rsamonitor"
             #ищем в ней цифры
