@@ -1,4 +1,5 @@
 async def parse_rsamonitor(text, client, alarm_receiver):
+    print("reading message")
     for line in text:
         if "Количество компаний в РСА: " in line: #настройки для "rsamonitor"
             #ищем в ней цифры

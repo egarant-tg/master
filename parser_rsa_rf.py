@@ -1,4 +1,5 @@
 async def parse_rsa_rf(text, client, alarm_receiver):
+    print("reading message")
     for line in text:
         #ищем нужную строку
         if "Количество СК в РСА: " in line: #настройки для "rsa_rf"
