@@ -8,6 +8,7 @@ import json
 import asyncio
 from telethon import TelegramClient, events
 from telethon.errors import SessionPasswordNeededError
+from telethon.sessions import StringSession
 from telethon.tl.functions.messages import (GetHistoryRequest)
 from telethon.tl.types import (
 PeerChannel
@@ -20,6 +21,7 @@ from parser_egarant_limiti import parse_egarant_limiti
 
 api_id = "5086045"
 api_hash = "e0bcc2b6aba38988f6675767aee63591"
+string_session = "1ApWapzMBu62vBenZBzr-NOhGlR3BlVst4V_8nKC0Vag1n5hI7TUY0stSet4-wCV218Q64Y6cbYpOzRVkC0_SmiXp5JZijwclv21ls09lq-j6_WL5okhC9yv_3B94pERxUCgtLjy5Zo6Dgd-qnlpNbASsf8qLoKQq6HnnFmjH_PvkwcSQVoHJS1GKRSrkLznMdFp1DXoTMTdkNXLTiGqxVdRZ8AkrROeuzrKVIwiG5H_inO8flZ5pElgJx0RkBg8LDdYXkUGYDNQHUllqjio9w9960TrQItFfaJCW2CsqYyt6batETFZOqbtxDSxkOEkEJbiq7gcR-WRzegKCZhxREeltTGaPMUs="
 #аккаунт получателя алярма
 alarm_receiver = "IC_quantity"
 #название канала
@@ -29,7 +31,8 @@ max_quotes = 1
 max_polis = 2
 time = datetime.datetime.now()
 
-client = TelegramClient("anon", api_id, api_hash)
+client = TelegramClient(StringSession(string_session), api_id, api_hash)
+#client = TelegramClient("anon", api_id, api_hash)
 client.start()
 print("Client Created")
 
