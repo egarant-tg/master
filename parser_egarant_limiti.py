@@ -1,5 +1,4 @@
 async def parse_egarant_limiti(text, client, alarm_receiver):
-    print("читаю сообщение...")
 
     for line in text:
         if "Количество СК в РСА: " in line: #настройки  для "rsamonitor"
