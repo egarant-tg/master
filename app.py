@@ -36,7 +36,7 @@ client = TelegramClient(StringSession(string_session), api_id, api_hash)
 #client = TelegramClient("anon", api_id, api_hash)
 client.start()
 print("Client Created")
-client.send_message("svatut", "Приложение запущено")
+
 
 @client.on(events.NewMessage(chats=entity))
 async def my_event_handler(event):
