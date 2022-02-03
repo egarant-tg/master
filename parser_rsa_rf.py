@@ -7,7 +7,7 @@ async def parse_rsa_rf(text, client, alarm_receiver):
             for n in line_with_sk:
                 if n.isdigit() and int(n)>20:
                     print("Количество СК меньше или равно двум, отправляю сообщение...")
-                    await client.send_message(alarm_receiver, "Возможно квота. На Е-Гаранте больше 20 СК!")
+                    client.send_message(alarm_receiver, "Возможно квота. На Е-Гаранте больше 20 СК!")
         elif "Согласие:" in line:
             #ищем в ней цифры
             line_with_sk = line.split()
