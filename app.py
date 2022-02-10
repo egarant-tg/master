@@ -33,7 +33,7 @@ max_polis = 2
 time = datetime.datetime.now()
 
 
-cd desktop/tgapp/mastetclient = TelegramClient(StringSession(string_session), api_id, api_hash)
+client = TelegramClient(StringSession(string_session), api_id, api_hash)
 #client = TelegramClient("anon", api_id, api_hash)
 client.start()
 print("Client Created")
