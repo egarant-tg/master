@@ -22,7 +22,7 @@ from parser_egarant_limiti import parse_egarant_limiti
 api_id = "5086045"
 api_hash = "e0bcc2b6aba38988f6675767aee63591"
 #string_session  =  "1ApWapzMBu62vBenZBzr-NOhGlR3BlVst4V_8nKC0Vag1n5hI7TUY0stSet4-wCV218Q64Y6cbYpOzRVkC0_SmiXp5JZijwclv21ls09lq-j6_WL5okhC9yv_3B94pERxUCgtLjy5Zo6Dgd-qnlpNbASsf8qLoKQq6HnnFmjH_PvkwcSQVoHJS1GKRSrkLznMdFp1DXoTMTdkNXLTiGqxVdRZ8AkrROeuzrKVIwiG5H_inO8flZ5pElgJx0RkBg8LDdYXkUGYDNQHUllqjio9w9960TrQItFfaJCW2CsqYyt6batETFZOqbtxDSxkOEkEJbiq7gcR-WRzegKCZhxREeltTGaPMUs="
-string_session = "1ApWapzMBu0bZla1lYqDwSJnRI6nasEwABF4LOxOxSFq6RjzSEvHizF4mTk94Mw9r3XXOGjKGCafF6jt6V7Ps7TP3ri1yt3xThYGatUGqLntxrRoYx7WK1Ry786BVwYw2v9is0pMMWUGR91SsRXrCL2-Bcmrmi-HKEq22bA-yU6CdXe--TzOCsLZJH3Q4McOXYsHikTZjIgikVSdtKKa9PSrFkHbGH_a9S-ohiwGKCN6ZEsGnRsww3g55Q5o4rr6hfPrg4Pp_Pcf1E-_TV5BJxovEbwoaqQeSC0NMtZEOD50aRD1eeV5PZdAPhYMMctJERXE3vbEYH0hMHHWd2W1Xhh5NQraQS3U="
+string_session = "1ApWapzMBu4iCo-jv1NAW5GebPhaJP3JjNpxfNgEEFv_w7aqJRz4W17jqfrxcgQF3cuyVOkZhXGH9zOEqmzllOYRq52cLk-IhhCEFpxrwdYGQgoy109XrmE4K3w5g4j9kAQb-FThI0UHfeldm8jnClFgqFn1KGzSPJHcwqZPSQ_oaAi2XAzWFYADrsH_yXlh6o4RSYQ8YP3sSW_9FNCpN7L50v2xnlH1iqbNgWtGZirdOnWvboQWCiCS3wHBb_68iAg7_3cTi3hIbh0_KVIxG90ZOiN4_JmADLqjSjazMP-bXFsMy0uFgxbzFuIGXf_z7m6TBFwkVgI9Ro7TaKAyCfX_kvrZSmt0="
 #аккаунт получателя алярма
 alarm_receiver = "IC_quantity"
 #название канала
@@ -34,6 +34,8 @@ time = datetime.datetime.now()
 
 
 client = TelegramClient(StringSession(string_session), api_id, api_hash)
+#with TelegramClient(StringSession(), api_id, api_hash) as client:
+ #   print(client.session.save())
 #client = TelegramClient("anon", api_id, api_hash)
 client.start()
 print("Client Created")
