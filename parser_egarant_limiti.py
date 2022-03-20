@@ -23,5 +23,5 @@ async def parse_egarant_limiti(text, client, alarm_receiver):
                 if n.isdigit() and int(n)<=250:
                     print("СК 'БАСК' меньше 250")
                     await client.send_message(alarm_receiver, "СК 'БАСК' меньше 250")
-                else 
+                else:
                     await client.send_message(alarm_receiver, "СК 'БАСК' больше 250, тест")
