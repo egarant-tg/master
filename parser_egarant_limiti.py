@@ -16,11 +16,11 @@ async def parse_egarant_limiti(text, client, alarm_receiver):
                 if n.isdigit() and int(n)>2:
                     print("СК 'Согласие' есть на Е-Гаранте")
                     await client.send_message(alarm_receiver, "СК 'Согласие' больше 3")
-        elif "БАСК" in line:
+        elif "Югория" in line:
             #ищем в ней цифры
             line_with_sk = line.split()
             for n in line_with_sk:
                 if n.isdigit() and int(n)<=250:
-                    print("СК 'БАСК' меньше 250")
-                    await client.send_message(alarm_receiver, "СК 'БАСК' меньше 250")
+                    print("СК 'Югория' меньше 250")
+                    await client.send_message(alarm_receiver, "СК 'Югория' меньше 250")
 
